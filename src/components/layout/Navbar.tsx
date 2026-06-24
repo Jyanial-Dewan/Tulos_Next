@@ -1,20 +1,51 @@
 "use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Heart, Menu, ShoppingBag, User } from "lucide-react";
+import { navLinks } from "@/data/data";
+import Image from "next/image";
+import logo from "@/images/tulos_logo.png";
+import Dropdown from "../Topbar/Dropdown";
 
 export default function Navbar() {
   return (
-    <nav className="flex items-center justify-between border-b px-6 py-3">
-      <Link href="/" className="text-lg font-bold">
-        Tulos
+    <nav className="flex items-center justify-between px-6 py-3 bg-white sticky top-0 shadow-md">
+      {/* Menu Button */}
+      <button className="md:hidden">
+        <Menu />
+      </button>
+
+      {/* Logo */}
+      <Link href={"/home"} className="cursor-pointer flex  gap-1 items-center">
+        <Image src={logo} alt="logo" height={40} width={40} />
+        <h3 className="font-extrabold text-lg">Tulos</h3>
       </Link>
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" asChild>
-          <Link href="/login">Login</Link>
+      {/* Nav Links */}
+      <div className="md:flex items-center gap-6 hidden">
+        {navLinks.map((link) => (
+          <Link
+            key={link.name}
+            href={link.href}
+            className="hover:text-orange-600 hover:scale-105 transition-all duration-300"
+          >
+            {link.name}
+          </Link>
+        ))}
+      </div>
+
+      {/* Buttons */}
+      <div className="flex gap-3 items-center">
+        <Button asChild className="rounded-full cursor-pointer w-7 h-7 p-1.5">
+          <Heart className="text-white" />
         </Button>
-        <Button asChild>
-          <Link href="/register">Register</Link>
+        <Button asChild className="rounded-full cursor-pointer w-7 h-7 p-1.5">
+          <ShoppingBag className="text-white" />
         </Button>
+        <Dropdown>
+          <Button asChild className="rounded-full cursor-pointer w-7 h-7 p-1.5">
+            <User className="text-white" />
+          </Button>
+        </Dropdown>
       </div>
     </nav>
   );

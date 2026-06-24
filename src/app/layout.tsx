@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
-import { Nunito } from "next/font/google";
+import { Smooch_Sans } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "@/store/store-provider";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { Toaster } from "@/components/ui/sonner";
 
-const nunito = Nunito({
-  variable: "--font-nunito",
+const font = Smooch_Sans({
+  variable: "--font-smooch_sans",
   subsets: ["latin"],
 });
 
@@ -21,14 +22,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${nunito.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${font.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <StoreProvider>
           <Navbar />
           <main className="flex-1">{children}</main>
+          <Toaster />
           <Footer />
         </StoreProvider>
       </body>
