@@ -1,9 +1,9 @@
 import type { LoginRequest, RegisterRequest, AuthResponse } from "./authTypes";
 
-const AUTH_API_BASE = "/api/auth";
+const AUTH_API_BASE = "/api";
 
 export async function login(data: LoginRequest): Promise<AuthResponse> {
-  const res = await fetch(AUTH_API_BASE, {
+  const res = await fetch(`${AUTH_API_BASE}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -16,10 +16,10 @@ export async function login(data: LoginRequest): Promise<AuthResponse> {
 }
 
 export async function register(data: RegisterRequest): Promise<AuthResponse> {
-  const res = await fetch(AUTH_API_BASE, {
+  const res = await fetch(`${AUTH_API_BASE}/users`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...data, action: "register" }),
+    body: JSON.stringify(data),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ message: "Registration failed" }));
