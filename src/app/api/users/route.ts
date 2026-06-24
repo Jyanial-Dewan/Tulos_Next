@@ -80,24 +80,24 @@ export async function POST(req: Request) {
 }
 
 // GET /api/users - Get current user
-export async function GET(req: Request) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader?.startsWith("Bearer ")) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
+// export async function GET(req: Request) {
+//   const authHeader = req.headers.get("authorization");
+//   if (!authHeader?.startsWith("Bearer ")) {
+//     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+//   }
 
-  return NextResponse.json({
-    id: crypto.randomUUID(),
-    name: "Demo User",
-    email: "demo@example.com",
-  });
-}
+//   return NextResponse.json({
+//     id: crypto.randomUUID(),
+//     name: "Demo User",
+//     email: "demo@example.com",
+//   });
+// }
 
-export async function PATCH(req: Request) {
-  const body = await req.json();
-  return NextResponse.json({
-    id: crypto.randomUUID(),
-    name: body.name ?? "Demo User",
-    email: body.email ?? "demo@example.com",
-  });
-}
+// export async function PATCH(req: Request) {
+//   const body = await req.json();
+//   return NextResponse.json({
+//     id: crypto.randomUUID(),
+//     name: body.name ?? "Demo User",
+//     email: body.email ?? "demo@example.com",
+//   });
+// }
