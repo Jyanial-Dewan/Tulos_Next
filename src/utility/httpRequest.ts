@@ -1,8 +1,18 @@
 import { Dispatch, SetStateAction } from "react";
 import { toast } from "sonner";
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 
 const AUTH_API_BASE = "/api";
+
+function getErrorMessage(error: unknown): string {
+  if (isAxiosError(error) && error.response?.data?.message) {
+    return error.response.data.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "An unexpected error occurred";
+}
 
 export const api = axios.create({
   baseURL: AUTH_API_BASE,
@@ -21,7 +31,7 @@ interface loadDataParams {
 interface postDataParams {
   url: string;
   setLoading?: Dispatch<SetStateAction<boolean>>;
-  payload: any;
+  payload: unknown;
   isConsole?: boolean;
   isToast?: boolean;
   accessToken?: string;
@@ -30,7 +40,7 @@ interface postDataParams {
 interface putDataParams {
   url: string;
   setLoading: Dispatch<SetStateAction<boolean>>;
-  payload: any;
+  payload: unknown;
   isConsole?: boolean;
   isToast?: boolean;
   accessToken?: string;
@@ -38,7 +48,7 @@ interface putDataParams {
 
 interface deleteDataParams {
   url?: string;
-  payload?: any;
+  payload?: unknown;
   accessToken?: string;
   isToast?: boolean;
 }
@@ -58,10 +68,8 @@ export async function loadData(params: loadDataParams) {
       return res;
     }
   } catch (error) {
-    if (error instanceof Error) {
-      if (params.isToast) {
-        toast(error.message);
-      }
+    if (params.isToast) {
+      toast(getErrorMessage(error));
     }
     return undefined;
   } finally {
@@ -82,19 +90,19 @@ export async function postData(params: postDataParams) {
         Authorization: `Bearer ${params.accessToken}`,
       },
     });
+
     if (res.status === 201 || res.status === 200) {
       if (params.isToast) {
         toast(res.data.message);
       }
-      return res as any;
+      return res;
     }
   } catch (error) {
-    if (error instanceof Error) {
-      if (params.isToast) {
-        toast(error.message);
-      }
-      return error.message;
+    const message = getErrorMessage(error);
+    if (params.isToast) {
+      toast(message);
     }
+    return message;
   } finally {
     if (params.setLoading) {
       params.setLoading(false);
@@ -115,15 +123,14 @@ export async function putData(params: putDataParams) {
       if (params.isToast) {
         toast(res.data.message);
       }
-      return res as any;
+      return res;
     }
   } catch (error) {
-    if (error instanceof Error) {
-      if (params.isToast) {
-        toast(error.message);
-      }
-      return error.message;
+    const message = getErrorMessage(error);
+    if (params.isToast) {
+      toast(message);
     }
+    return message;
   } finally {
     params.setLoading(false);
   }
@@ -143,14 +150,13 @@ export async function deleteData(params: deleteDataParams) {
       if (params.isToast) {
         toast(res.data.message);
       }
-      return res as any;
+      return res;
     }
   } catch (error) {
-    if (error instanceof Error) {
-      if (params.isToast) {
-        toast(error.message);
-      }
-      return error.message;
+    const message = getErrorMessage(error);
+    if (params.isToast) {
+      toast(message);
     }
+    return message;
   }
 }
