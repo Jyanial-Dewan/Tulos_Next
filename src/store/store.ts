@@ -1,10 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-import counterReducer from "@/features/counter/counterSlice";
-import authReducer from "@/features/auth/authSlice";
+import { userSlice } from "./slices/userSlice";
 
 export const makeStore = () =>
   configureStore({
-    reducer: { counter: counterReducer, auth: authReducer },
+    reducer: {
+      user: userSlice.reducer,
+    },
   });
 
 export type AppStore = ReturnType<typeof makeStore>;

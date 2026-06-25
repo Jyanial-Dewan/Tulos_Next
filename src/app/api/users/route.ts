@@ -73,7 +73,7 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json({ result, message: "User registered" });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
