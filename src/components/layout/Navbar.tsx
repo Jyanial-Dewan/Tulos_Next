@@ -16,7 +16,7 @@ export default function Navbar() {
       </button>
 
       {/* Logo */}
-      <Link href={"/home"} className="cursor-pointer flex  gap-1 items-center">
+      <Link href={"/"} className="cursor-pointer flex  gap-1 items-center">
         <Image src={logo} alt="logo" height={40} width={40} />
         <h3 className="font-extrabold text-lg">Tulos</h3>
       </Link>

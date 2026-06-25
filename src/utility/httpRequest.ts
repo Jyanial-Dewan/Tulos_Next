@@ -12,7 +12,6 @@ export const api = axios.create({
 });
 
 interface loadDataParams {
-  baseURL: string;
   url: string;
   setLoading?: Dispatch<SetStateAction<boolean>>;
   accessToken?: string;
@@ -20,7 +19,6 @@ interface loadDataParams {
 }
 
 interface postDataParams {
-  baseURL: string;
   url: string;
   setLoading?: Dispatch<SetStateAction<boolean>>;
   payload: any;
@@ -30,7 +28,6 @@ interface postDataParams {
 }
 
 interface putDataParams {
-  baseURL: string;
   url: string;
   setLoading: Dispatch<SetStateAction<boolean>>;
   payload: any;
@@ -40,8 +37,7 @@ interface putDataParams {
 }
 
 interface deleteDataParams {
-  url: string;
-  baseURL?: string;
+  url?: string;
   payload?: any;
   accessToken?: string;
   isToast?: boolean;
@@ -53,7 +49,7 @@ export async function loadData(params: loadDataParams) {
       params.setLoading(true);
     }
     const res = await api.get(`${params.url}`, {
-      baseURL: params.baseURL,
+      baseURL: AUTH_API_BASE,
       headers: {
         Authorization: `Bearer ${params.accessToken}`,
       },
@@ -81,7 +77,7 @@ export async function postData(params: postDataParams) {
       params.setLoading(true);
     }
     const res = await api.post(`${params.url}`, params.payload, {
-      baseURL: params.baseURL,
+      baseURL: AUTH_API_BASE,
       headers: {
         Authorization: `Bearer ${params.accessToken}`,
       },
@@ -110,7 +106,7 @@ export async function putData(params: putDataParams) {
   try {
     params.setLoading(true);
     const res = await api.put(`${params.url}`, params.payload, {
-      baseURL: params.baseURL,
+      baseURL: AUTH_API_BASE,
       headers: {
         Authorization: `Bearer ${params.accessToken}`,
       },
@@ -136,7 +132,7 @@ export async function putData(params: putDataParams) {
 export async function deleteData(params: deleteDataParams) {
   try {
     const res = await api.delete(`${params.url}`, {
-      baseURL: params.baseURL,
+      baseURL: AUTH_API_BASE,
       data: params.payload,
       headers: {
         Authorization: `Bearer ${params.accessToken}`,
