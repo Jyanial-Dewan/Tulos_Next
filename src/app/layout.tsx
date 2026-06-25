@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className={`${font.className} h-full antialiased`}>
         <StoreProvider>
           <Navbar />
-          <main>{children}</main>
+          <main className="w-[90%] min-h-screen mx-auto py-3">{children}</main>
           <Toaster />
           <Footer />
         </StoreProvider>

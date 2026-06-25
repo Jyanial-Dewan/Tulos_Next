@@ -23,6 +23,7 @@ const Dropdown = ({ children }: Props) => {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
+
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Link href={"/login"}>Login</Link>
