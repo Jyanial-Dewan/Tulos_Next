@@ -1,17 +1,35 @@
 "use client";
 
-import { useAppSelector } from "@/hooks/useAppStore";
+import HomeScreen from "@/components/layout/HomeScreen";
 import {} from "@/features/counter/counterSlice";
+import { useAppDispatch } from "@/hooks/useAppStore";
+import { setToken, UserTokenState } from "@/store/slices/userSlice";
+import { loadData } from "@/utility/httpRequest";
+import { endpoints } from "@/variables/variables";
+import { useEffect } from "react";
 
 export default function Home() {
-  const { access_token } = useAppSelector((state) => state.user.token);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    (async () => {
+      const params = {
+        url: endpoints.User,
+        // setLoading: setIsSubmitting,
+        // payload: { user: data.user, password: data.password },
+        // isConsole: true,
+        // isToast: true,
+      };
+
+      const tokenData = await loadData(params);
+      if (tokenData?.data) {
+        dispatch(setToken(tokenData.data as UserTokenState));
+      }
+    })();
+  }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-green-100">
-      <h1 className="font-bold text-7xl">Home</h1>
-      <div className="flex gap-2 items-center mt-4">
-        <h1 className="text-4xl font-mono w-16 text-center">{access_token}</h1>
-      </div>
+    <div className=" ">
+      <HomeScreen />
     </div>
   );
 }

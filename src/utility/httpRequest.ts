@@ -1,8 +1,18 @@
+import axios, { AxiosError, AxiosResponse, isAxiosError } from "axios";
 import { Dispatch, SetStateAction } from "react";
 import { toast } from "sonner";
-import axios from "axios";
 
 const AUTH_API_BASE = "/api";
+
+function getErrorMessage(error: unknown): string {
+  if (isAxiosError(error) && error.response?.data?.message) {
+    return error.response.data.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "An unexpected error occurred";
+}
 
 export const api = axios.create({
   baseURL: AUTH_API_BASE,
@@ -21,7 +31,7 @@ interface loadDataParams {
 interface postDataParams {
   url: string;
   setLoading?: Dispatch<SetStateAction<boolean>>;
-  payload: any;
+  payload: unknown;
   isConsole?: boolean;
   isToast?: boolean;
   accessToken?: string;
@@ -30,7 +40,7 @@ interface postDataParams {
 interface putDataParams {
   url: string;
   setLoading: Dispatch<SetStateAction<boolean>>;
-  payload: any;
+  payload: unknown;
   isConsole?: boolean;
   isToast?: boolean;
   accessToken?: string;
@@ -38,12 +48,14 @@ interface putDataParams {
 
 interface deleteDataParams {
   url?: string;
-  payload?: any;
+  payload?: unknown;
   accessToken?: string;
   isToast?: boolean;
 }
 
-export async function loadData(params: loadDataParams) {
+export async function loadData(
+  params: loadDataParams,
+): Promise<AxiosResponse | undefined> {
   try {
     if (params.setLoading) {
       params.setLoading(true);
@@ -58,9 +70,12 @@ export async function loadData(params: loadDataParams) {
       return res;
     }
   } catch (error) {
-    if (error instanceof Error) {
-      if (params.isToast) {
-        toast(error.message);
+    console.log(error, "error");
+    if (params.isToast) {
+      if (isAxiosError(error)) {
+        toast(error.response?.data?.message || error.message);
+      } else {
+        toast(getErrorMessage(error));
       }
     }
     return undefined;
@@ -71,7 +86,9 @@ export async function loadData(params: loadDataParams) {
   }
 }
 
-export async function postData(params: postDataParams) {
+export async function postData(
+  params: postDataParams,
+): Promise<AxiosResponse | undefined> {
   try {
     if (params.setLoading) {
       params.setLoading(true);
@@ -82,19 +99,23 @@ export async function postData(params: postDataParams) {
         Authorization: `Bearer ${params.accessToken}`,
       },
     });
+
     if (res.status === 201 || res.status === 200) {
       if (params.isToast) {
         toast(res.data.message);
       }
-      return res as any;
+      return res;
     }
   } catch (error) {
-    if (error instanceof Error) {
-      if (params.isToast) {
-        toast(error.message);
+    console.log(error, "error");
+    if (params.isToast) {
+      if (isAxiosError(error)) {
+        toast(error.response?.data?.message || error.message);
+      } else {
+        toast(getErrorMessage(error));
       }
-      return error.message;
     }
+    return undefined;
   } finally {
     if (params.setLoading) {
       params.setLoading(false);
@@ -102,7 +123,9 @@ export async function postData(params: postDataParams) {
   }
 }
 
-export async function putData(params: putDataParams) {
+export async function putData(
+  params: putDataParams,
+): Promise<AxiosResponse | undefined> {
   try {
     params.setLoading(true);
     const res = await api.put(`${params.url}`, params.payload, {
@@ -115,21 +138,26 @@ export async function putData(params: putDataParams) {
       if (params.isToast) {
         toast(res.data.message);
       }
-      return res as any;
+      return res;
     }
   } catch (error) {
-    if (error instanceof Error) {
-      if (params.isToast) {
-        toast(error.message);
+    console.log(error, "error");
+    if (params.isToast) {
+      if (isAxiosError(error)) {
+        toast(error.response?.data?.message || error.message);
+      } else {
+        toast(getErrorMessage(error));
       }
-      return error.message;
     }
+    return undefined;
   } finally {
     params.setLoading(false);
   }
 }
 
-export async function deleteData(params: deleteDataParams) {
+export async function deleteData(
+  params: deleteDataParams,
+): Promise<AxiosResponse | AxiosError | undefined> {
   try {
     const res = await api.delete(`${params.url}`, {
       baseURL: AUTH_API_BASE,
@@ -143,14 +171,13 @@ export async function deleteData(params: deleteDataParams) {
       if (params.isToast) {
         toast(res.data.message);
       }
-      return res as any;
+      return res;
     }
   } catch (error) {
-    if (error instanceof Error) {
-      if (params.isToast) {
-        toast(error.message);
-      }
-      return error.message;
+    console.log(error, "error");
+    if (params.isToast) {
+      toast(getErrorMessage(error));
     }
+    return undefined;
   }
 }
