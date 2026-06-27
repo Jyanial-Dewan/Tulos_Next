@@ -54,7 +54,7 @@ export async function POST(req: Request) {
 
     if (!result) {
       return NextResponse.json(
-        { message: "Failed to create user" },
+        { message: "Failed to register user" },
         { status: 500 },
       );
     }

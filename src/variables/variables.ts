@@ -9,5 +9,6 @@ export const endpoints = {
   Login: "/auth/login",
   User: "/auth/user",
   Register: "/users",
-  Catagories: "/catagories",
+  Catagories: "/categories",
+  Collections: "/collections",
 };

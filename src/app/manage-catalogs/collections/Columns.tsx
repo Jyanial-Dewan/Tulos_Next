@@ -1,7 +1,7 @@
-import { ICatagory } from "@/store/slices/productSlice";
+import { ICollection } from "@/store/slices/productSlice";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
-export const getColumns = (): ColumnDef<ICatagory>[] => [
+export const getColumns = (): ColumnDef<ICollection>[] => [
   {
     id: "select",
     size: 24,
@@ -12,7 +12,7 @@ export const getColumns = (): ColumnDef<ICatagory>[] => [
     enableResizing: false,
   },
   {
-    accessorKey: "catagory_name",
+    accessorKey: "collection_name",
     enableResizing: true,
     sortingFn: (rowA, rowB, columnId) => {
       const a = rowA.getValue(columnId) as string;
@@ -26,14 +26,14 @@ export const getColumns = (): ColumnDef<ICatagory>[] => [
           className="min-w-max"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Catagory Name
+          Collection Name
           <ArrowUpDown className="ml-2 h-4 w-4 cursor-pointer inline-block" />
         </div>
       );
     },
 
     cell: ({ row }) => (
-      <div className="min-w-max p-1">{row.getValue("catagory_name")}</div>
+      <div className="min-w-max p-1">{row.getValue("collection_name")}</div>
     ),
   },
 ];

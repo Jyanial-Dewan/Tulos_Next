@@ -24,3 +24,23 @@ model users {
   created_at  DateTime?    @default(now()) @db.Timestamp(6)
   credentials credentials?
 }
+
+model categories {
+  catagory_id   Int    @id @default(autoincrement())
+  catagory_name String @unique @db.VarChar(20)
+}
+
+model collections {
+  collection_id   Int    @id @default(autoincrement())
+  collection_name String @unique @db.VarChar(20)
+}
+
+model colors {
+  color_id   Int    @id @default(autoincrement())
+  color_name String @unique @db.VarChar(20)
+}
+
+model tags {
+  tag_id   Int    @id @default(autoincrement())
+  tag_name String @unique @db.VarChar(20)
+}
