@@ -192,7 +192,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
     };
 
     const res = await deleteData(params);
-    if (res.status === 200) {
+    if (res?.status === 200) {
       setReloadController((prev) => prev + 1);
     }
   };

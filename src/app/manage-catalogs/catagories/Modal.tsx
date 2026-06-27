@@ -99,8 +99,8 @@ const Modal = ({
         // accessToken: token.access_token,
       };
       const res = await postData(params);
-      console.log(res);
-      if (res.status === 201) {
+
+      if (res?.status === 201) {
         setState((prev) => prev + 1);
         form.reset();
         handleClose();
@@ -115,7 +115,7 @@ const Modal = ({
       };
       console.log(params);
       const res = await putData(params);
-      if (res.status === 200) {
+      if (res?.status === 200) {
         setState((prev) => prev + 1);
         form.reset();
         handleClose();

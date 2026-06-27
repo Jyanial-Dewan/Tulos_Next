@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Controller, useForm } from "react-hook-form";
-import { ICatagory, ICollection } from "@/store/slices/productSlice";
+import { ICollection } from "@/store/slices/productSlice";
 import { loadData, postData, putData } from "@/utility/httpRequest";
 import { endpoints } from "@/variables/variables";
 import CustomModal from "@/components/modal/CustomModal";
@@ -101,7 +101,7 @@ const Modal = ({
       };
       const res = await postData(params);
       console.log(res);
-      if (res.status === 201) {
+      if (res?.status === 201) {
         setState((prev) => prev + 1);
         form.reset();
         handleClose();
@@ -116,7 +116,7 @@ const Modal = ({
       };
       console.log(params);
       const res = await putData(params);
-      if (res.status === 200) {
+      if (res?.status === 200) {
         setState((prev) => prev + 1);
         form.reset();
         handleClose();

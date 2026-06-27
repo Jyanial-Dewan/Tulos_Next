@@ -26,7 +26,7 @@ import { FileEdit, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getColumns } from "./Columns";
-import { ICatagory, ICollection } from "@/store/slices/productSlice";
+import { ICollection } from "@/store/slices/productSlice";
 import Modal from "./Modal";
 import { endpoints } from "@/variables/variables";
 import { deleteData, loadData } from "@/utility/httpRequest";
@@ -192,7 +192,7 @@ const CollectionTable = ({ catalogType, setCatalogType }: Props) => {
     };
 
     const res = await deleteData(params);
-    if (res.status === 200) {
+    if (res?.status === 200) {
       setReloadController((prev) => prev + 1);
     }
   };
