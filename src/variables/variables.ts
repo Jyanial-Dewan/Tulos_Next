@@ -8,5 +8,6 @@ export const REFRESH_TOKEN_EXPIRED_TIME =
 export const endpoints = {
   Login: "/auth/login",
   Register: "/users",
-  Catagories: "/catagories",
+  Catagories: "/categories",
+  Collections: "/collections",
 };

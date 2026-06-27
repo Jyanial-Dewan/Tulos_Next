@@ -34,7 +34,6 @@ const Alert = ({
   actionName,
   onContinue,
   onClick,
-  iconColor = "black",
   customButton,
   open,
   onOpenChange,
@@ -51,7 +50,7 @@ const Alert = ({
             disabled={disabled}
             className={`${disabled ? "cursor-not-allowed" : "cursor-pointer"} flex gap-1 flex-1 items-center justify-center`}
           >
-            <Trash color={disabled ? "#e5e5e5" : iconColor} />
+            <Trash />
             <p className="hidden md:block">Delete</p>
           </Button>
         )}
@@ -59,9 +58,7 @@ const Alert = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="pb-2 border-b">
-            <span className="text-black text-[16px]">
-              Are you sure you want to {actionName}?
-            </span>
+            Are you sure you want to {actionName}?
           </AlertDialogTitle>
           <AlertDialogDescription className="max-h-[50vh] overflow-auto mt-2 text-gray-700 scrollbar-thin">
             {children}
@@ -72,7 +69,7 @@ const Alert = ({
             <AlertDialogCancel className="flex-1" onClick={onCancel}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction className="flext-1" onClick={onContinue}>
+            <AlertDialogAction className="flex-1" onClick={onContinue}>
               Continue
             </AlertDialogAction>
           </span>

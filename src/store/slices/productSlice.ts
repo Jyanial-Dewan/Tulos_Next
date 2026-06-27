@@ -37,8 +37,14 @@ export const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    // Catagories
     setCatagories: (state, action: PayloadAction<ICatagory[]>) => {
       state.catagories = action.payload;
+    },
+
+    // Collections
+    setCollections: (state, action: PayloadAction<ICollection[]>) => {
+      state.collections = action.payload;
     },
   },
 });

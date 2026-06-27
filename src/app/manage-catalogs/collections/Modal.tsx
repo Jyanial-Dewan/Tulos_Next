@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Controller, useForm } from "react-hook-form";
-import { ICatagory } from "@/store/slices/productSlice";
+import { ICatagory, ICollection } from "@/store/slices/productSlice";
 import { loadData, postData, putData } from "@/utility/httpRequest";
 import { endpoints } from "@/variables/variables";
 import CustomModal from "@/components/modal/CustomModal";
@@ -25,7 +25,7 @@ interface Props {
   setAction: React.Dispatch<React.SetStateAction<string>>;
   openModal: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
-  selectedItems: ICatagory[];
+  selectedItems: ICollection[];
   setState: React.Dispatch<React.SetStateAction<number>>;
   catalogType: string;
 }
@@ -42,16 +42,17 @@ const Modal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const CatagorySchema = z.object({
-    catagory_name: z.string().min(1, "Catagory Name is required"),
+  const CollectionSchema = z.object({
+    collection_name: z.string().min(1, "Collection Name is required"),
   });
 
-  type catagoryForm = z.infer<typeof CatagorySchema>;
+  type catagoryForm = z.infer<typeof CollectionSchema>;
 
   const form = useForm<catagoryForm>({
-    resolver: zodResolver(CatagorySchema),
+    resolver: zodResolver(CollectionSchema),
     defaultValues: {
-      catagory_name: action === "edit" ? selectedItems[0].catagory_name : "",
+      collection_name:
+        action === "edit" ? selectedItems[0].collection_name : "",
     },
   });
 
@@ -59,24 +60,24 @@ const Modal = ({
     if (!openModal) return; // 🔥 KEY FIX
 
     if (action === "edit" && selectedItems[0]) {
-      const fetchLookup = async () => {
+      const fetchCollection = async () => {
         const res = await loadData({
-          url: `${endpoints.Catagories}?catagory_id=${selectedItems[0].catagory_id}`,
+          url: `${endpoints.Collections}?collection_id=${selectedItems[0].collection_id}`,
           setLoading: setIsLoading,
           //   accessToken: token.access_token,
         });
 
         form.reset({
-          catagory_name: res?.data.result.catagory_name,
+          collection_name: res?.data.result.collection_name,
         });
       };
 
-      fetchLookup();
+      fetchCollection();
     }
 
     if (action === "add") {
       form.reset({
-        catagory_name: "",
+        collection_name: "",
       });
     }
   }, [action, selectedItems, openModal, form]);
@@ -88,11 +89,11 @@ const Modal = ({
 
   const onSubmit = async (data: catagoryForm) => {
     const payload = {
-      catagory_name: data.catagory_name,
+      collection_name: data.collection_name,
     };
     if (action === "add") {
       const params = {
-        url: `${endpoints.Catagories}`,
+        url: `${endpoints.Collections}`,
         setLoading: setIsSubmitting,
         payload,
         isToast: true,
@@ -107,7 +108,7 @@ const Modal = ({
       }
     } else {
       const params = {
-        url: `${endpoints.Catagories}?catagory_id=${selectedItems[0].catagory_id}`,
+        url: `${endpoints.Collections}?collection_id=${selectedItems[0].collection_id}`,
         setLoading: setIsSubmitting,
         payload,
         isToast: true,
@@ -125,7 +126,7 @@ const Modal = ({
 
   return (
     <>
-      {action && openModal && catalogType === "catagory" && (
+      {action && openModal && catalogType === "collection" && (
         <CustomModal className="md:w-120 w-80  overflow-hidden">
           <div className="flex justify-between bg-[#CEDEF2] p-4">
             <h3 className="font-semibold capitalize">
@@ -145,18 +146,18 @@ const Modal = ({
                   <FieldGroup>
                     {/* Category Name */}
                     <Controller
-                      name="catagory_name"
+                      name="collection_name"
                       control={form.control}
                       render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
                           <FieldLabel htmlFor="form-rhf-demo-title">
-                            Catagory Name
+                            Collection Name
                           </FieldLabel>
                           <Input
                             {...field}
                             id="form-rhf-demo-title"
                             aria-invalid={fieldState.invalid}
-                            placeholder="Shirt"
+                            placeholder="Spring 2026"
                             autoComplete="off"
                           />
                           {fieldState.invalid && (
