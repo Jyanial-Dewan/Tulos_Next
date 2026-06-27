@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { setTokenCookies, verifyAuth } from "@/lib/auth";
+import { NextResponse } from "next/server";
+import { NextRequestWithUser, setTokenCookies, verifyAuth } from "@/lib/auth";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequestWithUser) {
   const auth = await verifyAuth(req);
 
   if (!auth.authorized) {
@@ -10,8 +10,8 @@ export async function GET(req: NextRequest) {
 
   const response = NextResponse.json({
     isLoggedIn: true,
-    user_id: auth.decoded.user_id,
-    user_type: auth.decoded.user_type,
+    user_id: req.user!.user_id,
+    user_type: req.user!.user_type,
     access_token: auth.access_token,
     refresh_token: auth.refresh_token,
     issuedAt: new Date(),

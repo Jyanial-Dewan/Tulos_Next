@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { verifyAuth } from "@/lib/auth";
+import { NextResponse } from "next/server";
+import { NextRequestWithUser, verifyAuth } from "@/lib/auth";
 
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequestWithUser) {
   const auth = await verifyAuth(req);
 
   if (!auth.authorized) {

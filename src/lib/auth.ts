@@ -36,7 +36,9 @@ export function generateAccessTokenAndRefreshToken(props: object) {
   return { accessToken, refreshToken };
 }
 
-export async function verifyAuth(req: NextRequest): Promise<AuthResult | AuthError> {
+export type NextRequestWithUser = NextRequest & { user?: AuthUser };
+
+export async function verifyAuth(req: NextRequestWithUser): Promise<AuthResult | AuthError> {
   const access_token = req.cookies.get("access_token")?.value;
   const refresh_token = req.cookies.get("refresh_token")?.value;
 
@@ -50,9 +52,12 @@ export async function verifyAuth(req: NextRequest): Promise<AuthResult | AuthErr
       JWT_SECRET_ACCESS_TOKEN!,
     ) as jwt.JwtPayload;
 
+    const user = decoded as unknown as AuthUser;
+    req.user = user;
+
     return {
       authorized: true,
-      decoded: decoded as unknown as AuthUser,
+      decoded: user,
       access_token,
       refresh_token: refresh_token ?? "",
     };
@@ -89,9 +94,12 @@ export async function verifyAuth(req: NextRequest): Promise<AuthResult | AuthErr
               JWT_SECRET_ACCESS_TOKEN!,
             ) as jwt.JwtPayload;
 
+            const user = { ...refreshedDecoded, user_type: userType } as unknown as AuthUser;
+            req.user = user;
+
             return {
               authorized: true,
-              decoded: { ...refreshedDecoded, user_type: userType } as unknown as AuthUser,
+              decoded: user,
               access_token: accessToken,
               refresh_token: refreshToken,
               isRefreshed: true,

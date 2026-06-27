@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/db";
-import { setTokenCookies, verifyAuth } from "@/lib/auth";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequestWithUser, setTokenCookies, verifyAuth } from "@/lib/auth";
+import { NextResponse } from "next/server";
 
 export async function GET(
-  req: NextRequest,
+  req: NextRequestWithUser,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const auth = await verifyAuth(req);
