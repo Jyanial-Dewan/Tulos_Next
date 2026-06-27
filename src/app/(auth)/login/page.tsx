@@ -1,9 +1,5 @@
 "use client";
 
-import * as React from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,11 +17,15 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { endpoints } from "@/variables/variables";
-import { postData } from "@/utility/httpRequest";
-import { setToken } from "@/store/slices/userSlice";
 import { useAppDispatch } from "@/hooks/useAppStore";
+import { setToken } from "@/store/slices/userSlice";
+import { postData } from "@/utility/httpRequest";
+import { endpoints } from "@/variables/variables";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
+import * as React from "react";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
 
 const formSchema = z.object({
   user: z
@@ -58,11 +58,10 @@ const Login = () => {
       payload: { user: data.user, password: data.password },
       isConsole: true,
       isToast: true,
-      // accessToken?: string;
     };
 
     const res = await postData(params);
-    if (res.status === 200) {
+    if (res?.status === 200) {
       dispatch(setToken(res?.data));
     }
   };
