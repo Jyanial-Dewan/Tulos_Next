@@ -1,17 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { verifyAuth } from "@/lib/auth";
 
-export async function POST() {
-  try {
-    const response = NextResponse.json({
-      message: "Logged out successfully",
-    });
+export async function POST(req: NextRequest) {
+  const auth = await verifyAuth(req);
 
-    response.cookies.delete("access_token");
-    response.cookies.delete("refresh_token");
-
-    return response;
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Logout failed";
-    return NextResponse.json({ error: message }, { status: 500 });
+  if (!auth.authorized) {
+    return NextResponse.json({ message: "Please login." }, { status: 401 });
   }
+
+  const response = NextResponse.json({
+    message: "Logged out successfully",
+  });
+
+  response.cookies.delete("access_token");
+  response.cookies.delete("refresh_token");
+
+  return response;
 }
