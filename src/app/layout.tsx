@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
-import { Prata } from "next/font/google";
+import { Cinzel } from "next/font/google";
 import "./globals.css";
 import StoreProvider from "@/store/store-provider";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Toaster } from "@/components/ui/sonner";
 
-const font = Prata({
-  weight: ["400"],
+const font = Cinzel({
+  weight: ["400", "500", "600", "700", "800", "900"],
   subsets: ["latin"],
 });
 
