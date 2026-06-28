@@ -4,6 +4,8 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CatgoriesTable from "./catagories/CatgoriesTable";
 import CollectionTable from "./collections/CollectionTable";
+import ColorTable from "./colors/ColorTable";
+import TagTable from "./tags/TagTable";
 
 const ManageProductMetadata = () => {
   const [catalogType, setCatalogType] = React.useState("");
@@ -12,7 +14,7 @@ const ManageProductMetadata = () => {
       {/* Catagories */}
       <Card>
         <CardHeader>
-          <CardTitle>Manage Catagories</CardTitle>
+          <CardTitle>Manage Categories</CardTitle>
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           <CatgoriesTable
@@ -20,8 +22,8 @@ const ManageProductMetadata = () => {
             setCatalogType={setCatalogType}
           />
         </CardContent>
-        {/* Collections */}
       </Card>
+      {/* Collections */}
       <Card>
         <CardHeader>
           <CardTitle>Manage Collections</CardTitle>
@@ -31,6 +33,29 @@ const ManageProductMetadata = () => {
             catalogType={catalogType}
             setCatalogType={setCatalogType}
           />
+        </CardContent>
+      </Card>
+
+      {/* Colors */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Colors</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          <ColorTable
+            catalogType={catalogType}
+            setCatalogType={setCatalogType}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Tags */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Tags</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          <TagTable catalogType={catalogType} setCatalogType={setCatalogType} />
         </CardContent>
       </Card>
     </div>

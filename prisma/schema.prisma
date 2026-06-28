@@ -26,8 +26,9 @@ model users {
 }
 
 model categories {
-  catagory_id   Int    @id @default(autoincrement())
-  catagory_name String @unique @db.VarChar(20)
+  catagory_id   Int     @id @default(autoincrement())
+  catagory_name String  @unique @db.VarChar(20)
+  sizes         sizes[]
 }
 
 model collections {
@@ -43,4 +44,28 @@ model colors {
 model tags {
   tag_id   Int    @id @default(autoincrement())
   tag_name String @unique @db.VarChar(20)
+}
+
+model availabilities {
+  availability_id   Int    @id @default(autoincrement())
+  availability_name String @unique @db.VarChar(20)
+}
+
+model brands {
+  brand_id   Int    @id @default(autoincrement())
+  brand_name String @unique @db.VarChar(20)
+}
+
+model genders {
+  gender_id   Int    @id @default(autoincrement())
+  gender_name String @unique @db.VarChar(20)
+}
+
+model sizes {
+  size_id     Int        @id @default(autoincrement())
+  catagory_id Int
+  size_name   String     @db.VarChar(20)
+  categories  categories @relation(fields: [catagory_id], references: [catagory_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_category")
+
+  @@unique([catagory_id, size_name], map: "unique_category_size")
 }

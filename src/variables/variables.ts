@@ -11,4 +11,6 @@ export const endpoints = {
   Register: "/users",
   Catagories: "/categories",
   Collections: "/collections",
+  Colors: "/colors",
+  Tags: "/tags",
 };

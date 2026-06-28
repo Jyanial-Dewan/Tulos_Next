@@ -26,7 +26,7 @@ import { FileEdit, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getColumns } from "./Columns";
-import { ICatagory } from "@/store/slices/productSlice";
+import { IColor } from "@/store/slices/productSlice";
 import Modal from "./Modal";
 import { endpoints } from "@/variables/variables";
 import { deleteData, loadData } from "@/utility/httpRequest";
@@ -39,7 +39,7 @@ interface Props {
   setCatalogType: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
+const ColorTable = ({ catalogType, setCatalogType }: Props) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -47,10 +47,8 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [data, setData] = React.useState<ICatagory[] | []>([]);
-  const [selectedCatagories, setSelectedCatagories] = React.useState<
-    ICatagory[]
-  >([]);
+  const [data, setData] = React.useState<IColor[] | []>([]);
+  const [selectedColors, setSelectedColors] = React.useState<IColor[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
   const [isSelectAll, setIsSelectAll] = React.useState(false);
@@ -106,24 +104,24 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
 
   React.useEffect(() => {
     const params = {
-      url: `${endpoints.Catagories}`,
+      url: `${endpoints.Colors}`,
       // accessToken: `${token.access_token}`,
       setLoading: setIsLoading,
     };
 
-    const fetchCatagories = async () => {
+    const fetchColors = async () => {
       const res = await loadData(params);
-      console.log(res);
+
       if (res?.data) {
         setData(res.data.result);
         // setTotalPage(res.pages);
       }
-      setSelectedCatagories([]);
+      setSelectedColors([]);
       setIsloaded(true);
     };
 
     const delayDebounce = setTimeout(() => {
-      fetchCatagories();
+      fetchColors();
       //   setSelectedItem(null);
     }, 1000);
 
@@ -132,25 +130,25 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
 
   React.useEffect(() => {
     if (data?.length > 0) {
-      if (selectedCatagories.length !== data.length) {
+      if (selectedColors.length !== data.length) {
         setIsSelectAll(false);
       } else {
         setIsSelectAll(true);
       }
     }
-    const ids = selectedCatagories?.map((item) => item.catagory_id);
+    const ids = selectedColors?.map((item) => item.color_id);
     setSelectedIds(ids);
-  }, [data.length, selectedCatagories]);
+  }, [data.length, selectedColors]);
 
-  const handleRowSelection = (rowData: ICatagory) => {
-    setSelectedCatagories((prev) => {
+  const handleRowSelection = (rowData: IColor) => {
+    setSelectedColors((prev) => {
       const lookupValue = prev.find(
-        (item) => item.catagory_id === rowData.catagory_id,
+        (item) => item.color_id === rowData.color_id,
       );
 
       if (lookupValue) {
         const filtered = prev.filter(
-          (item) => item.catagory_id !== rowData.catagory_id,
+          (item) => item.color_id !== rowData.color_id,
         );
         return filtered;
       } else {
@@ -160,12 +158,12 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   };
 
   const handleAdd = () => {
-    setCatalogType("category");
+    setCatalogType("color");
     setAction("add");
     setOpenModal(true);
   };
   const handleEdit = () => {
-    setCatalogType("category");
+    setCatalogType("color");
     setAction("edit");
     setOpenModal(true);
   };
@@ -173,18 +171,18 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   const handleSelectAll = () => {
     if (isSelectAll) {
       setIsSelectAll(false);
-      setSelectedCatagories([]);
+      setSelectedColors([]);
     } else {
       setIsSelectAll(true);
-      setSelectedCatagories(data);
+      setSelectedColors(data);
     }
   };
 
   const handleDelete = async () => {
     const params = {
-      url: endpoints.Catagories,
+      url: endpoints.Colors,
       payload: {
-        catagory_ids: selectedIds,
+        color_ids: selectedIds,
       },
       isToast: true,
       setLoading: setIsDeleteLoading,
@@ -196,7 +194,6 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
       setReloadController((prev) => prev + 1);
     }
   };
-
   return (
     <>
       {/* Action Item */}
@@ -212,14 +209,14 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
           <Button
             className="flex gap-1 flex-1 items-center justify-center"
             onClick={handleEdit}
-            disabled={selectedCatagories.length !== 1}
+            disabled={selectedColors.length !== 1}
           >
             <FileEdit />
             <p className="hidden md:block">Edit</p>
           </Button>
 
           <Alert
-            disabled={selectedCatagories.length === 0 || isDeleteLoading}
+            disabled={selectedColors.length === 0 || isDeleteLoading}
             actionName="delete"
             onContinue={handleDelete}
             tooltipTitle="Delete"
@@ -229,9 +226,9 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
                 <Spinner />
               ) : (
                 <span className="flex flex-col items-start">
-                  {selectedCatagories.map((item, index) => (
-                    <span key={item.catagory_id}>
-                      {index + 1}. Category Name : {item.catagory_name}
+                  {selectedColors.map((item, index) => (
+                    <span key={item.color_id}>
+                      {index + 1}. Color Name : {item.color_name}
                     </span>
                   ))}
                 </span>
@@ -313,9 +310,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
                       {index === 0 ? (
                         <Checkbox
                           className="border border-black"
-                          checked={selectedIds.includes(
-                            row.original.catagory_id,
-                          )}
+                          checked={selectedIds.includes(row.original.color_id)}
                           onCheckedChange={() =>
                             handleRowSelection(row.original)
                           }
@@ -341,7 +336,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
         setAction={setAction}
         openModal={openModal}
         setOpenModal={setOpenModal}
-        selectedItems={selectedCatagories}
+        selectedItems={selectedColors}
         setState={setReloadController}
         catalogType={catalogType}
       />
@@ -349,4 +344,4 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   );
 };
 
-export default CatgoriesTable;
+export default ColorTable;
