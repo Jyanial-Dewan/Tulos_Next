@@ -6,6 +6,10 @@ import CatgoriesTable from "./catagories/CatgoriesTable";
 import CollectionTable from "./collections/CollectionTable";
 import ColorTable from "./colors/ColorTable";
 import TagTable from "./tags/TagTable";
+import SizeTable from "./sizes/SizeTable";
+import GenderTable from "./genders/GenderTable";
+import AvailabilityTable from "./availabilities/AvailabilityTable";
+import BrandTable from "./brands/BrandTable";
 
 const ManageProductMetadata = () => {
   const [catalogType, setCatalogType] = React.useState("");
@@ -56,6 +60,57 @@ const ManageProductMetadata = () => {
         </CardHeader>
         <CardContent className="text-sm text-muted-foreground">
           <TagTable catalogType={catalogType} setCatalogType={setCatalogType} />
+        </CardContent>
+      </Card>
+
+      {/* Sizes */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Sizes</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          <SizeTable
+            catalogType={catalogType}
+            setCatalogType={setCatalogType}
+          />
+        </CardContent>
+      </Card>
+      {/* Genders */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Genders</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          <GenderTable
+            catalogType={catalogType}
+            setCatalogType={setCatalogType}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Availabilities */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Availabilities</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          <AvailabilityTable
+            catalogType={catalogType}
+            setCatalogType={setCatalogType}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Brands */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Brands</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-muted-foreground">
+          <BrandTable
+            catalogType={catalogType}
+            setCatalogType={setCatalogType}
+          />
         </CardContent>
       </Card>
     </div>

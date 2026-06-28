@@ -20,28 +20,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileEdit, Plus } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { getColumns } from "./Columns";
-import { ICatagory, setCatagories } from "@/store/slices/productSlice";
+import { IBrand } from "@/store/slices/productSlice";
 import Modal from "./Modal";
 import { endpoints } from "@/variables/variables";
 import { deleteData, loadData } from "@/utility/httpRequest";
 import ActionButtons from "@/components/actionButton/ActionButton";
 import Alert from "@/components/alert/CustomAlert";
 import { Spinner } from "@/components/ui/spinner";
-import { useAppDispatch } from "@/hooks/useAppStore";
 
 interface Props {
   catalogType: string;
   setCatalogType: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
-  const dispatch = useAppDispatch();
+const BrandTable = ({ catalogType, setCatalogType }: Props) => {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -49,10 +45,8 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [data, setData] = React.useState<ICatagory[] | []>([]);
-  const [selectedCatagories, setSelectedCatagories] = React.useState<
-    ICatagory[]
-  >([]);
+  const [data, setData] = React.useState<IBrand[] | []>([]);
+  const [selectedBrands, setSelectedBrands] = React.useState<IBrand[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
   const [isSelectAll, setIsSelectAll] = React.useState(false);
@@ -108,25 +102,24 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
 
   React.useEffect(() => {
     const params = {
-      url: `${endpoints.Catagories}`,
+      url: `${endpoints.Brands}`,
       // accessToken: `${token.access_token}`,
       setLoading: setIsLoading,
     };
 
-    const fetchCatagories = async () => {
+    const fetchBrands = async () => {
       const res = await loadData(params);
-      console.log(res);
+
       if (res?.data) {
         setData(res.data.result);
-        dispatch(setCatagories(res.data.result as ICatagory[]));
         // setTotalPage(res.pages);
       }
-      setSelectedCatagories([]);
+      setSelectedBrands([]);
       setIsloaded(true);
     };
 
     const delayDebounce = setTimeout(() => {
-      fetchCatagories();
+      fetchBrands();
       //   setSelectedItem(null);
     }, 1000);
 
@@ -135,25 +128,23 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
 
   React.useEffect(() => {
     if (data?.length > 0) {
-      if (selectedCatagories.length !== data.length) {
+      if (selectedBrands.length !== data.length) {
         setIsSelectAll(false);
       } else {
         setIsSelectAll(true);
       }
     }
-    const ids = selectedCatagories?.map((item) => item.catagory_id);
+    const ids = selectedBrands?.map((item) => item.brand_id);
     setSelectedIds(ids);
-  }, [data.length, selectedCatagories]);
+  }, [data.length, selectedBrands]);
 
-  const handleRowSelection = (rowData: ICatagory) => {
-    setSelectedCatagories((prev) => {
-      const lookupValue = prev.find(
-        (item) => item.catagory_id === rowData.catagory_id,
-      );
+  const handleRowSelection = (rowData: IBrand) => {
+    setSelectedBrands((prev) => {
+      const gender = prev.find((item) => item.brand_id === rowData.brand_id);
 
-      if (lookupValue) {
+      if (gender) {
         const filtered = prev.filter(
-          (item) => item.catagory_id !== rowData.catagory_id,
+          (item) => item.brand_id !== rowData.brand_id,
         );
         return filtered;
       } else {
@@ -163,12 +154,12 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   };
 
   const handleAdd = () => {
-    setCatalogType("category");
+    setCatalogType("brand");
     setAction("add");
     setOpenModal(true);
   };
   const handleEdit = () => {
-    setCatalogType("category");
+    setCatalogType("brand");
     setAction("edit");
     setOpenModal(true);
   };
@@ -176,18 +167,18 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   const handleSelectAll = () => {
     if (isSelectAll) {
       setIsSelectAll(false);
-      setSelectedCatagories([]);
+      setSelectedBrands([]);
     } else {
       setIsSelectAll(true);
-      setSelectedCatagories(data);
+      setSelectedBrands(data);
     }
   };
 
   const handleDelete = async () => {
     const params = {
-      url: endpoints.Catagories,
+      url: endpoints.Brands,
       payload: {
-        catagory_ids: selectedIds,
+        brand_ids: selectedIds,
       },
       isToast: true,
       setLoading: setIsDeleteLoading,
@@ -199,7 +190,6 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
       setReloadController((prev) => prev + 1);
     }
   };
-
   return (
     <>
       {/* Action Item */}
@@ -215,14 +205,14 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
           <Button
             className="flex gap-1 flex-1 items-center justify-center"
             onClick={handleEdit}
-            disabled={selectedCatagories.length !== 1}
+            disabled={selectedBrands.length !== 1}
           >
             <FileEdit />
             <p className="hidden md:block">Edit</p>
           </Button>
 
           <Alert
-            disabled={selectedCatagories.length === 0 || isDeleteLoading}
+            disabled={selectedBrands.length === 0 || isDeleteLoading}
             actionName="delete"
             onContinue={handleDelete}
             tooltipTitle="Delete"
@@ -232,9 +222,9 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
                 <Spinner />
               ) : (
                 <span className="flex flex-col items-start">
-                  {selectedCatagories.map((item, index) => (
-                    <span key={item.catagory_id}>
-                      {index + 1}. Category Name : {item.catagory_name}
+                  {selectedBrands.map((item, index) => (
+                    <span key={item.brand_id}>
+                      {index + 1}. Brand Name : {item.brand_name}
                     </span>
                   ))}
                 </span>
@@ -316,9 +306,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
                       {index === 0 ? (
                         <Checkbox
                           className="border border-black"
-                          checked={selectedIds.includes(
-                            row.original.catagory_id,
-                          )}
+                          checked={selectedIds.includes(row.original.brand_id)}
                           onCheckedChange={() =>
                             handleRowSelection(row.original)
                           }
@@ -344,7 +332,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
         setAction={setAction}
         openModal={openModal}
         setOpenModal={setOpenModal}
-        selectedItems={selectedCatagories}
+        selectedItems={selectedBrands}
         setState={setReloadController}
         catalogType={catalogType}
       />
@@ -352,4 +340,4 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   );
 };
 
-export default CatgoriesTable;
+export default BrandTable;

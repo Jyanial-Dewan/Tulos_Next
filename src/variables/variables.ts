@@ -13,4 +13,8 @@ export const endpoints = {
   Collections: "/collections",
   Colors: "/colors",
   Tags: "/tags",
+  Genders: "/genders",
+  Availabilities: "/availabilities",
+  Brands: "/brands",
+  Sizes: "/sizes",
 };
