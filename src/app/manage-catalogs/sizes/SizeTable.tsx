@@ -23,25 +23,24 @@ import {
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileEdit, Plus } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { getColumns } from "./Columns";
-import { ICatagory, setCatagories } from "@/store/slices/productSlice";
+import { ISize } from "@/store/slices/productSlice";
 import Modal from "./Modal";
 import { endpoints } from "@/variables/variables";
 import { deleteData, loadData } from "@/utility/httpRequest";
 import ActionButtons from "@/components/actionButton/ActionButton";
 import Alert from "@/components/alert/CustomAlert";
 import { Spinner } from "@/components/ui/spinner";
-import { useAppDispatch } from "@/hooks/useAppStore";
+import { useAppSelector } from "@/hooks/useAppStore";
 
 interface Props {
   catalogType: string;
   setCatalogType: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
-  const dispatch = useAppDispatch();
+const SizeTable = ({ catalogType, setCatalogType }: Props) => {
+  const { catagories } = useAppSelector((state) => state.product);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -49,10 +48,8 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [data, setData] = React.useState<ICatagory[] | []>([]);
-  const [selectedCatagories, setSelectedCatagories] = React.useState<
-    ICatagory[]
-  >([]);
+  const [data, setData] = React.useState<ISize[] | []>([]);
+  const [selectedSizes, setSelectedSizes] = React.useState<ISize[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
   const [isSelectAll, setIsSelectAll] = React.useState(false);
@@ -63,7 +60,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   const [isloaded, setIsloaded] = React.useState(false);
   const [action, setAction] = React.useState("");
 
-  const columns = React.useMemo(() => getColumns(), []);
+  const columns = React.useMemo(() => getColumns(catagories), [catagories]);
   const table = useReactTable({
     data,
     columns,
@@ -108,25 +105,24 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
 
   React.useEffect(() => {
     const params = {
-      url: `${endpoints.Catagories}`,
+      url: `${endpoints.Sizes}`,
       // accessToken: `${token.access_token}`,
       setLoading: setIsLoading,
     };
 
-    const fetchCatagories = async () => {
+    const fetchSizes = async () => {
       const res = await loadData(params);
-      console.log(res);
+
       if (res?.data) {
         setData(res.data.result);
-        dispatch(setCatagories(res.data.result as ICatagory[]));
         // setTotalPage(res.pages);
       }
-      setSelectedCatagories([]);
+      setSelectedSizes([]);
       setIsloaded(true);
     };
 
     const delayDebounce = setTimeout(() => {
-      fetchCatagories();
+      fetchSizes();
       //   setSelectedItem(null);
     }, 1000);
 
@@ -135,25 +131,23 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
 
   React.useEffect(() => {
     if (data?.length > 0) {
-      if (selectedCatagories.length !== data.length) {
+      if (selectedSizes.length !== data.length) {
         setIsSelectAll(false);
       } else {
         setIsSelectAll(true);
       }
     }
-    const ids = selectedCatagories?.map((item) => item.catagory_id);
+    const ids = selectedSizes?.map((item) => item.size_id);
     setSelectedIds(ids);
-  }, [data.length, selectedCatagories]);
+  }, [data.length, selectedSizes]);
 
-  const handleRowSelection = (rowData: ICatagory) => {
-    setSelectedCatagories((prev) => {
-      const lookupValue = prev.find(
-        (item) => item.catagory_id === rowData.catagory_id,
-      );
+  const handleRowSelection = (rowData: ISize) => {
+    setSelectedSizes((prev) => {
+      const size = prev.find((item) => item.size_id === rowData.size_id);
 
-      if (lookupValue) {
+      if (size) {
         const filtered = prev.filter(
-          (item) => item.catagory_id !== rowData.catagory_id,
+          (item) => item.size_id !== rowData.size_id,
         );
         return filtered;
       } else {
@@ -163,12 +157,12 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   };
 
   const handleAdd = () => {
-    setCatalogType("category");
+    setCatalogType("size");
     setAction("add");
     setOpenModal(true);
   };
   const handleEdit = () => {
-    setCatalogType("category");
+    setCatalogType("size");
     setAction("edit");
     setOpenModal(true);
   };
@@ -176,18 +170,18 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   const handleSelectAll = () => {
     if (isSelectAll) {
       setIsSelectAll(false);
-      setSelectedCatagories([]);
+      setSelectedSizes([]);
     } else {
       setIsSelectAll(true);
-      setSelectedCatagories(data);
+      setSelectedSizes(data);
     }
   };
 
   const handleDelete = async () => {
     const params = {
-      url: endpoints.Catagories,
+      url: endpoints.Sizes,
       payload: {
-        catagory_ids: selectedIds,
+        size_ids: selectedIds,
       },
       isToast: true,
       setLoading: setIsDeleteLoading,
@@ -199,7 +193,6 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
       setReloadController((prev) => prev + 1);
     }
   };
-
   return (
     <>
       {/* Action Item */}
@@ -215,14 +208,14 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
           <Button
             className="flex gap-1 flex-1 items-center justify-center"
             onClick={handleEdit}
-            disabled={selectedCatagories.length !== 1}
+            disabled={selectedSizes.length !== 1}
           >
             <FileEdit />
             <p className="hidden md:block">Edit</p>
           </Button>
 
           <Alert
-            disabled={selectedCatagories.length === 0 || isDeleteLoading}
+            disabled={selectedSizes.length === 0 || isDeleteLoading}
             actionName="delete"
             onContinue={handleDelete}
             tooltipTitle="Delete"
@@ -232,9 +225,9 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
                 <Spinner />
               ) : (
                 <span className="flex flex-col items-start">
-                  {selectedCatagories.map((item, index) => (
-                    <span key={item.catagory_id}>
-                      {index + 1}. Category Name : {item.catagory_name}
+                  {selectedSizes.map((item, index) => (
+                    <span key={item.size_id}>
+                      {index + 1}. Size Name : {item.size_name}
                     </span>
                   ))}
                 </span>
@@ -316,9 +309,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
                       {index === 0 ? (
                         <Checkbox
                           className="border border-black"
-                          checked={selectedIds.includes(
-                            row.original.catagory_id,
-                          )}
+                          checked={selectedIds.includes(row.original.size_id)}
                           onCheckedChange={() =>
                             handleRowSelection(row.original)
                           }
@@ -344,7 +335,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
         setAction={setAction}
         openModal={openModal}
         setOpenModal={setOpenModal}
-        selectedItems={selectedCatagories}
+        selectedItems={selectedSizes}
         setState={setReloadController}
         catalogType={catalogType}
       />
@@ -352,4 +343,4 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   );
 };
 
-export default CatgoriesTable;
+export default SizeTable;

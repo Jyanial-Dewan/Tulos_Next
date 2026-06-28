@@ -19,21 +19,42 @@ export interface ITag {
   tag_name: string;
 }
 
-interface UserSliceState {
+export interface IGender {
+  gender_id: number;
+  gender_name: string;
+}
+
+export interface IAvailability {
+  availability_id: number;
+  availability_name: string;
+}
+
+export interface IBrand {
+  brand_id: number;
+  brand_name: string;
+}
+
+export interface ISize {
+  size_id: number;
+  catagory_id: number;
+  size_name: string;
+}
+
+interface ProductSliceState {
   catagories: ICatagory[];
   colors: IColor[];
   collections: ICollection[];
   tags: ITag[];
 }
 
-const initialState: UserSliceState = {
+const initialState: ProductSliceState = {
   catagories: [],
   colors: [],
   collections: [],
   tags: [],
 };
 
-export const userSlice = createSlice({
+export const productSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
@@ -49,6 +70,6 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setCatagories } = userSlice.actions;
+export const { setCatagories } = productSlice.actions;
 
-export default userSlice.reducer;
+export default productSlice.reducer;
