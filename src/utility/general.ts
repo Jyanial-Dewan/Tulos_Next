@@ -1,4 +1,4 @@
-import { ICatagory } from "@/store/slices/productSlice";
+import { ICatagory } from "@/store/slices/catalogSlice";
 
 export const convertToTitleCase = (str: string) => {
   // convert "profile_type_one" to 'Profile Type One'

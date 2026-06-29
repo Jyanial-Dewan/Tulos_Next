@@ -26,46 +26,112 @@ model users {
 }
 
 model categories {
-  catagory_id   Int     @id @default(autoincrement())
-  catagory_name String  @unique @db.VarChar(20)
+  catagory_id   Int        @id @default(autoincrement())
+  catagory_name String     @unique @db.VarChar(20)
+  products      products[]
   sizes         sizes[]
 }
 
 model collections {
-  collection_id   Int    @id @default(autoincrement())
-  collection_name String @unique @db.VarChar(20)
+  collection_id   Int        @id @default(autoincrement())
+  collection_name String     @unique @db.VarChar(20)
+  products        products[]
 }
 
 model colors {
-  color_id   Int    @id @default(autoincrement())
-  color_name String @unique @db.VarChar(20)
+  color_id         Int                @id @default(autoincrement())
+  color_name       String             @unique @db.VarChar(20)
+  product_variants product_variants[]
 }
 
 model tags {
-  tag_id   Int    @id @default(autoincrement())
-  tag_name String @unique @db.VarChar(20)
+  tag_id       Int            @id @default(autoincrement())
+  tag_name     String         @unique @db.VarChar(20)
+  product_tags product_tags[]
 }
 
 model availabilities {
-  availability_id   Int    @id @default(autoincrement())
-  availability_name String @unique @db.VarChar(20)
+  availability_id   Int        @id @default(autoincrement())
+  availability_name String     @unique @db.VarChar(20)
+  products          products[]
 }
 
 model brands {
-  brand_id   Int    @id @default(autoincrement())
-  brand_name String @unique @db.VarChar(20)
+  brand_id   Int        @id @default(autoincrement())
+  brand_name String     @unique @db.VarChar(20)
+  products   products[]
 }
 
 model genders {
-  gender_id   Int    @id @default(autoincrement())
-  gender_name String @unique @db.VarChar(20)
+  gender_id   Int        @id @default(autoincrement())
+  gender_name String     @unique @db.VarChar(20)
+  products    products[]
 }
 
 model sizes {
-  size_id     Int        @id @default(autoincrement())
-  catagory_id Int
-  size_name   String     @db.VarChar(20)
-  categories  categories @relation(fields: [catagory_id], references: [catagory_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_category")
+  size_id          Int                @id @default(autoincrement())
+  catagory_id      Int
+  size_name        String             @db.VarChar(20)
+  product_variants product_variants[]
+  categories       categories         @relation(fields: [catagory_id], references: [catagory_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_category")
 
   @@unique([catagory_id, size_name], map: "unique_category_size")
+}
+
+model product_images {
+  image_id   Int      @id @default(autoincrement())
+  product_id Int
+  image_url  String
+  products   products @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model product_tags {
+  product_id Int
+  tag_id     Int
+  products   products @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+  tags       tags     @relation(fields: [tag_id], references: [tag_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([product_id, tag_id])
+}
+
+model product_variants {
+  variant_id       Int       @id @default(autoincrement())
+  product_id       Int
+  color_id         Int
+  size_id          Int
+  sku              String    @unique @db.VarChar(100)
+  barcode          String?   @db.VarChar(100)
+  price            Decimal   @db.Decimal(10, 2)
+  compare_at_price Decimal?  @db.Decimal(10, 2)
+  cost_price       Decimal?  @db.Decimal(10, 2)
+  stock            Int?      @default(0)
+  weight           Decimal?  @db.Decimal(10, 2)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  updated_at       DateTime? @default(now()) @db.Timestamp(6)
+  colors           colors    @relation(fields: [color_id], references: [color_id], onDelete: NoAction, onUpdate: NoAction)
+  products         products  @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+  sizes            sizes     @relation(fields: [size_id], references: [size_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([product_id, color_id, size_id], map: "unique_variant")
+}
+
+model products {
+  product_id       Int                @id @default(autoincrement())
+  product_name     String             @db.VarChar(255)
+  description      String?
+  catagory_id      Int
+  brand_id         Int?
+  collection_id    Int?
+  gender_id        Int?
+  availability_id  Int?
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?          @default(now()) @db.Timestamp(6)
+  product_images   product_images[]
+  product_tags     product_tags[]
+  product_variants product_variants[]
+  availabilities   availabilities?    @relation(fields: [availability_id], references: [availability_id], onDelete: NoAction, onUpdate: NoAction)
+  brands           brands?            @relation(fields: [brand_id], references: [brand_id], onDelete: NoAction, onUpdate: NoAction)
+  categories       categories         @relation(fields: [catagory_id], references: [catagory_id], onDelete: NoAction, onUpdate: NoAction)
+  collections      collections?       @relation(fields: [collection_id], references: [collection_id], onDelete: NoAction, onUpdate: NoAction)
+  genders          genders?           @relation(fields: [gender_id], references: [gender_id], onDelete: NoAction, onUpdate: NoAction)
 }
