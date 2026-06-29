@@ -1,4 +1,4 @@
-import { IGender } from "@/store/slices/productSlice";
+import { IGender } from "@/store/slices/catalogSlice";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 export const getColumns = (): ColumnDef<IGender>[] => [

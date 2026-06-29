@@ -26,7 +26,7 @@ import { FileEdit, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { getColumns } from "./Columns";
-import { ITag } from "@/store/slices/productSlice";
+import { ITag } from "@/store/slices/catalogSlice";
 import Modal from "./Modal";
 import { endpoints } from "@/variables/variables";
 import { deleteData, loadData } from "@/utility/httpRequest";

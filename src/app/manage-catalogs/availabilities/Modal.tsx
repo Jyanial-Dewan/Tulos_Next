@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Controller, useForm } from "react-hook-form";
-import { IAvailability } from "@/store/slices/productSlice";
+import { IAvailability } from "@/store/slices/catalogSlice";
 import { loadData, postData, putData } from "@/utility/httpRequest";
 import { endpoints } from "@/variables/variables";
 import CustomModal from "@/components/modal/CustomModal";

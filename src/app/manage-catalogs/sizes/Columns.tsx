@@ -1,4 +1,4 @@
-import { ICatagory, ISize } from "@/store/slices/productSlice";
+import { ICatagory, ISize } from "@/store/slices/catalogSlice";
 import { categoryName } from "@/utility/general";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";

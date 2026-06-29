@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Controller, useForm } from "react-hook-form";
-import { ICatagory } from "@/store/slices/productSlice";
+import { ICatagory } from "@/store/slices/catalogSlice";
 import { loadData, postData, putData } from "@/utility/httpRequest";
 import { endpoints } from "@/variables/variables";
 import CustomModal from "@/components/modal/CustomModal";
@@ -125,7 +125,7 @@ const Modal = ({
 
   return (
     <>
-      {action && openModal && catalogType === "catagory" && (
+      {action && openModal && catalogType === "category" && (
         <CustomModal className="md:w-120 w-80  overflow-hidden">
           <div className="flex justify-between bg-[#CEDEF2] p-4">
             <h3 className="font-semibold capitalize">

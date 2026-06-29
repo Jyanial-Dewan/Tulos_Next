@@ -25,7 +25,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FileEdit, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getColumns } from "./Columns";
-import { ISize } from "@/store/slices/productSlice";
+import { ISize } from "@/store/slices/catalogSlice";
 import Modal from "./Modal";
 import { endpoints } from "@/variables/variables";
 import { deleteData, loadData } from "@/utility/httpRequest";
@@ -40,7 +40,7 @@ interface Props {
 }
 
 const SizeTable = ({ catalogType, setCatalogType }: Props) => {
-  const { catagories } = useAppSelector((state) => state.product);
+  const { catagories } = useAppSelector((state) => state.catalog);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
