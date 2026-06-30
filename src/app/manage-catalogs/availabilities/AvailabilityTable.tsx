@@ -24,13 +24,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FileEdit, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getColumns } from "./Columns";
-import { IAvailability } from "@/store/slices/catalogSlice";
+import { IAvailability, setAvailabilities } from "@/store/slices/catalogSlice";
 import Modal from "./Modal";
 import { endpoints } from "@/variables/variables";
 import { deleteData, loadData } from "@/utility/httpRequest";
 import ActionButtons from "@/components/actionButton/ActionButton";
 import Alert from "@/components/alert/CustomAlert";
 import { Spinner } from "@/components/ui/spinner";
+import { useAppDispatch } from "@/hooks/useAppStore";
 
 interface Props {
   catalogType: string;
@@ -38,6 +39,7 @@ interface Props {
 }
 
 const AvailabilityTable = ({ catalogType, setCatalogType }: Props) => {
+  const dispatch = useAppDispatch();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -114,7 +116,7 @@ const AvailabilityTable = ({ catalogType, setCatalogType }: Props) => {
 
       if (res?.data) {
         setData(res.data.result);
-        // setTotalPage(res.pages);
+        dispatch(setAvailabilities(res.data.result));
       }
       setSelectAvailabilities([]);
       setIsloaded(true);
@@ -126,7 +128,7 @@ const AvailabilityTable = ({ catalogType, setCatalogType }: Props) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounce);
-  }, [table, reloadController]);
+  }, [table, reloadController, dispatch]);
 
   React.useEffect(() => {
     if (data?.length > 0) {

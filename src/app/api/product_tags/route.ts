@@ -55,13 +55,13 @@ export async function POST(req: Request) {
 
     if (!result) {
       return NextResponse.json(
-        { message: "Failed to add tags" },
+        { message: "Failed to product" },
         { status: 500 },
       );
     }
 
     return NextResponse.json(
-      { result, message: "Tags added" },
+      { result, message: "Product added" },
       { status: 201 },
     );
   } catch (error: any) {

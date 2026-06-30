@@ -131,7 +131,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounce);
-  }, [table, reloadController]);
+  }, [table, reloadController, dispatch]);
 
   React.useEffect(() => {
     if (data?.length > 0) {

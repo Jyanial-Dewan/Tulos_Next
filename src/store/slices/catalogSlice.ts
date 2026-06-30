@@ -45,6 +45,10 @@ interface CatalogSliceState {
   colors: IColor[];
   collections: ICollection[];
   tags: ITag[];
+  genders: IGender[];
+  availabilities: IAvailability[];
+  brands: IBrand[];
+  sizes: ISize[];
 }
 
 const initialState: CatalogSliceState = {
@@ -52,6 +56,10 @@ const initialState: CatalogSliceState = {
   colors: [],
   collections: [],
   tags: [],
+  genders: [],
+  availabilities: [],
+  brands: [],
+  sizes: [],
 };
 
 export const catalogSlice = createSlice({
@@ -67,9 +75,48 @@ export const catalogSlice = createSlice({
     setCollections: (state, action: PayloadAction<ICollection[]>) => {
       state.collections = action.payload;
     },
+
+    // Colors
+    setColors: (state, action: PayloadAction<IColor[]>) => {
+      state.colors = action.payload;
+    },
+
+    // Tags
+    setTags: (state, action: PayloadAction<ITag[]>) => {
+      state.tags = action.payload;
+    },
+
+    // Genders
+    setGenders: (state, action: PayloadAction<IGender[]>) => {
+      state.genders = action.payload;
+    },
+
+    // Availabilities
+    setAvailabilities: (state, action: PayloadAction<IAvailability[]>) => {
+      state.availabilities = action.payload;
+    },
+
+    // Brands
+    setBrands: (state, action: PayloadAction<IBrand[]>) => {
+      state.brands = action.payload;
+    },
+
+    // Sizes
+    setSizes: (state, action: PayloadAction<ISize[]>) => {
+      state.sizes = action.payload;
+    },
   },
 });
 
-export const { setCatagories } = catalogSlice.actions;
+export const {
+  setCatagories,
+  setCollections,
+  setColors,
+  setAvailabilities,
+  setBrands,
+  setGenders,
+  setSizes,
+  setTags,
+} = catalogSlice.actions;
 
 export default catalogSlice.reducer;

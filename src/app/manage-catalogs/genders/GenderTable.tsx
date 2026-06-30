@@ -24,13 +24,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FileEdit, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getColumns } from "./Columns";
-import { IGender } from "@/store/slices/catalogSlice";
+import { IGender, setGenders } from "@/store/slices/catalogSlice";
 import Modal from "./Modal";
 import { endpoints } from "@/variables/variables";
 import { deleteData, loadData } from "@/utility/httpRequest";
 import ActionButtons from "@/components/actionButton/ActionButton";
 import Alert from "@/components/alert/CustomAlert";
 import { Spinner } from "@/components/ui/spinner";
+import { useAppDispatch } from "@/hooks/useAppStore";
 
 interface Props {
   catalogType: string;
@@ -38,6 +39,7 @@ interface Props {
 }
 
 const GenderTable = ({ catalogType, setCatalogType }: Props) => {
+  const dispatch = useAppDispatch();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -112,7 +114,7 @@ const GenderTable = ({ catalogType, setCatalogType }: Props) => {
 
       if (res?.data) {
         setData(res.data.result);
-        // setTotalPage(res.pages);
+        dispatch(setGenders(res.data.result));
       }
       setSelectedGenders([]);
       setIsloaded(true);
@@ -124,7 +126,7 @@ const GenderTable = ({ catalogType, setCatalogType }: Props) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounce);
-  }, [table, reloadController]);
+  }, [table, reloadController, dispatch]);
 
   React.useEffect(() => {
     if (data?.length > 0) {

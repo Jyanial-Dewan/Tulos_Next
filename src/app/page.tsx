@@ -10,6 +10,7 @@ import { useEffect } from "react";
 
 export default function Home() {
   const dispatch = useAppDispatch();
+
   useEffect(() => {
     (async () => {
       const params = {
@@ -25,7 +26,7 @@ export default function Home() {
         dispatch(setToken(tokenData.data as UserTokenState));
       }
     })();
-  }, []);
+  }, [dispatch]);
 
   return (
     <div className=" ">
