@@ -1,4 +1,4 @@
-export default function ManageCatalogsLayout({
+export default function ManageProductsLayout({
   children,
 }: {
   children: React.ReactNode;

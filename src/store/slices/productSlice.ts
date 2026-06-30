@@ -1,32 +1,32 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-export interface IVariant {
-  variant_id?: number;
-  color_id: number;
-  size_id: number;
-  sku: string;
-  barcode?: string | null;
-  price: number;
-  compare_at_price?: number | null;
-  cost_price?: number | null;
-  stock: number;
-  weight?: number | null;
+export interface IProduct {
+  product_id: number;
+  product_name: string;
+  description: string;
+  catagory_id: number;
+  brand_id: number;
+  collection_id: number;
+  gender_id: number;
+  availability_id: number;
+  created_at: Date;
+  updated_at: Date;
 }
 
 interface ProductSliceState {
-  variants: IVariant[];
+  products: IProduct[];
 }
 
 const initialState: ProductSliceState = {
-  variants: [],
+  products: [],
 };
 
-export const catalogSlice = createSlice({
-  name: "user",
+export const productSlice = createSlice({
+  name: "products",
   initialState,
   reducers: {},
 });
 
-export const {} = catalogSlice.actions;
+export const {} = productSlice.actions;
 
-export default catalogSlice.reducer;
+export default productSlice.reducer;

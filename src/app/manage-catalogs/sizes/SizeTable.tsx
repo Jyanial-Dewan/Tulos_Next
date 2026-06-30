@@ -25,14 +25,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FileEdit, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getColumns } from "./Columns";
-import { ISize } from "@/store/slices/catalogSlice";
+import { ISize, setSizes } from "@/store/slices/catalogSlice";
 import Modal from "./Modal";
 import { endpoints } from "@/variables/variables";
 import { deleteData, loadData } from "@/utility/httpRequest";
 import ActionButtons from "@/components/actionButton/ActionButton";
 import Alert from "@/components/alert/CustomAlert";
 import { Spinner } from "@/components/ui/spinner";
-import { useAppSelector } from "@/hooks/useAppStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/useAppStore";
 
 interface Props {
   catalogType: string;
@@ -40,6 +40,7 @@ interface Props {
 }
 
 const SizeTable = ({ catalogType, setCatalogType }: Props) => {
+  const dispatch = useAppDispatch();
   const { catagories } = useAppSelector((state) => state.catalog);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -115,7 +116,7 @@ const SizeTable = ({ catalogType, setCatalogType }: Props) => {
 
       if (res?.data) {
         setData(res.data.result);
-        // setTotalPage(res.pages);
+        dispatch(setSizes(res.data.result));
       }
       setSelectedSizes([]);
       setIsloaded(true);
@@ -127,7 +128,7 @@ const SizeTable = ({ catalogType, setCatalogType }: Props) => {
     }, 1000);
 
     return () => clearTimeout(delayDebounce);
-  }, [table, reloadController]);
+  }, [table, reloadController, dispatch]);
 
   React.useEffect(() => {
     if (data?.length > 0) {

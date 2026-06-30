@@ -17,4 +17,6 @@ export const endpoints = {
   Availabilities: "/availabilities",
   Brands: "/brands",
   Sizes: "/sizes",
+  Products: "/products",
+  ProductTags: "/product_tags",
 };
