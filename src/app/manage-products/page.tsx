@@ -1,7 +1,12 @@
 import React from "react";
+import Products from "./products/Proucts";
 
 const ManageProducts = () => {
-  return <div className="grid md:grid-cols-2">Prodcut Table</div>;
+  return (
+    <div>
+      <Products />
+    </div>
+  );
 };
 
 export default ManageProducts;
