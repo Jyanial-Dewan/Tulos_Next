@@ -1,0 +1,44 @@
+import React from "react";
+import { toast } from "sonner";
+
+interface RowsProps {
+  limit: number;
+  setLimit: (value: React.SetStateAction<number>) => void;
+}
+
+function Rows({ limit, setLimit }: RowsProps) {
+  const handleRow = (value: number) => {
+    if (value < 1) {
+      toast("The value must be greater than 0");
+      return;
+    } else {
+      setLimit(value);
+    }
+  };
+
+  const inputRef = React.useRef(null);
+
+  const handleClick = () => {
+    if (inputRef.current) {
+      (inputRef.current as HTMLInputElement).select();
+    }
+  };
+
+  return (
+    <div className="flex gap-2 items-center ml-auto">
+      <h3>Rows :</h3>
+      <input
+        type="number"
+        placeholder="Rows"
+        value={limit}
+        min={1}
+        ref={inputRef}
+        onClick={handleClick}
+        onChange={(e) => handleRow(Number(e.target.value))}
+        className="w-20 border rounded p-2"
+      />
+    </div>
+  );
+}
+
+export default Rows;

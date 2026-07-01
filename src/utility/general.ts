@@ -1,4 +1,9 @@
-import { ICatagory } from "@/store/slices/catalogSlice";
+import {
+  IAvailability,
+  IBrand,
+  ICatagory,
+  ICollection,
+} from "@/store/slices/catalogSlice";
 
 export const convertToTitleCase = (str: string) => {
   // convert "profile_type_one" to 'Profile Type One'
@@ -18,5 +23,43 @@ export const categoryName = (
 
   if (category) {
     return category.catagory_name;
+  }
+};
+
+export const brandName = (id: number | undefined, brands: IBrand[]) => {
+  if (!id) return;
+
+  const brand = brands.find((item) => item.brand_id === id);
+
+  if (brand) {
+    return brand.brand_name;
+  }
+};
+
+export const collectionName = (
+  id: number | undefined,
+  collections: ICollection[],
+) => {
+  if (!id) return;
+
+  const collection = collections.find((item) => item.collection_id === id);
+
+  if (collection) {
+    return collection.collection_name;
+  }
+};
+
+export const availabilityName = (
+  id: number | undefined,
+  availabilities: IAvailability[],
+) => {
+  if (!id) return;
+
+  const availability = availabilities.find(
+    (item) => item.availability_id === id,
+  );
+
+  if (availability) {
+    return availability.availability_name;
   }
 };

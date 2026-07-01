@@ -3,8 +3,14 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
+
   const productId = searchParams.get("product_id");
+  const page = searchParams.get("page");
+  const limit = searchParams.get("limit");
+  const productName = searchParams.get("product_name");
+
   try {
+    // Get a single product by ID
     if (productId) {
       const result = await prisma.products.findUnique({
         where: {
@@ -15,25 +21,60 @@ export async function GET(req: Request) {
       if (!result) {
         return NextResponse.json(
           { message: "No product found" },
-          { status: 409 },
+          { status: 404 },
         );
       }
 
       return NextResponse.json({ result });
     }
 
-    const result = await prisma.products.findMany();
+    // Build the where clause dynamically
+    const where = {
+      ...(productName && {
+        product_name: {
+          contains: productName,
+          mode: "insensitive" as const,
+        },
+      }),
+    };
 
-    if (!result) {
-      return NextResponse.json(
-        { message: "Failed to find any product" },
-        { status: 500 },
-      );
+    // Pagination
+    if (page && limit) {
+      const pageNumber = Number(page);
+      const limitNumber = Number(limit);
+
+      const total = await prisma.products.count({
+        where,
+      });
+
+      const result = await prisma.products.findMany({
+        where,
+        skip: (pageNumber - 1) * limitNumber,
+        take: limitNumber,
+      });
+
+      return NextResponse.json({
+        result,
+        page: pageNumber,
+        limit: limitNumber,
+        total,
+        totalPages: Math.ceil(total / limitNumber),
+      });
     }
+
+    // Get all products (with optional search)
+    const result = await prisma.products.findMany({
+      where,
+    });
 
     return NextResponse.json({ result });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: error.message,
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -167,6 +208,38 @@ export async function PUT(req: Request) {
 
     return NextResponse.json(
       { result, message: "Product edited" },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  const body = await req.json();
+  const { product_ids } = body;
+
+  try {
+    if (!Array.isArray(product_ids) || product_ids.length === 0) {
+      return NextResponse.json(
+        { message: "Product ids are required" },
+        { status: 422 },
+      );
+    }
+
+    const result = await prisma.products.deleteMany({
+      where: {
+        product_id: {
+          in: product_ids.map(Number),
+        },
+      },
+    });
+
+    return NextResponse.json(
+      {
+        result,
+        message: `${result.count} product${result.count === 1 ? "" : "s"} deleted`,
+      },
       { status: 200 },
     );
   } catch (error: any) {
