@@ -1,6 +1,6 @@
 "use client";
 
-import HomeScreen from "@/components/layout/HomeScreen";
+import HomeScreen from "@/components/HomeScreen/HomeScreen";
 import {} from "@/features/counter/counterSlice";
 import { useAppDispatch } from "@/hooks/useAppStore";
 import { setToken, UserTokenState } from "@/store/slices/userSlice";

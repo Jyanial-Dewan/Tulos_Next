@@ -253,7 +253,7 @@ const Products = () => {
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="h-72">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

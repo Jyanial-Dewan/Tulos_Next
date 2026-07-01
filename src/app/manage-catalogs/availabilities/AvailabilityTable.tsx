@@ -242,7 +242,7 @@ const AvailabilityTable = ({ catalogType, setCatalogType }: Props) => {
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="h-50">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
