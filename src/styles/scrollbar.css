@@ -1,0 +1,54 @@
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #000 transparent;
+}
+
+.no-x-scroll [data-slot="table-container"] {
+  overflow-x: visible !important;
+}
+
+.no-y-scroll [data-slot="table-container"] {
+  overflow-y: visible !important;
+}
+
+.scrollbar-thin,
+.scrollbar-custom {
+  scrollbar-color: rgb(0, 0, 0) transparent !important;
+}
+
+.scrollbar-thin::-webkit-scrollbar,
+.scrollbar-thin *::-webkit-scrollbar,
+.scrollbar-custom::-webkit-scrollbar,
+.scrollbar-custom *::-webkit-scrollbar {
+  width: 5px !important;
+  height: 5px !important;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track,
+.scrollbar-thin *::-webkit-scrollbar-track,
+.scrollbar-custom::-webkit-scrollbar-track,
+.scrollbar-custom *::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb,
+.scrollbar-thin *::-webkit-scrollbar-thumb,
+.scrollbar-custom::-webkit-scrollbar-thumb,
+.scrollbar-custom *::-webkit-scrollbar-thumb {
+  background: rgb(0, 0, 0) !important;
+  border-radius: 10px !important;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover,
+.scrollbar-thin *::-webkit-scrollbar-thumb:hover,
+.scrollbar-custom::-webkit-scrollbar-thumb:hover,
+.scrollbar-custom *::-webkit-scrollbar-thumb:hover {
+  background: rgb(0, 0, 0) !important;
+}
+
+.scrollbar-thin::-webkit-scrollbar-corner,
+.scrollbar-thin *::-webkit-scrollbar-corner,
+.scrollbar-custom::-webkit-scrollbar-corner,
+.scrollbar-custom *::-webkit-scrollbar-corner {
+  background: transparent !important;
+}

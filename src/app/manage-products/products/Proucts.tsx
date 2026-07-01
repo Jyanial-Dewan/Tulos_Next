@@ -253,7 +253,7 @@ const Products = () => {
       </div>
 
       {/* Table */}
-      <div>
+      <div className="h-72">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

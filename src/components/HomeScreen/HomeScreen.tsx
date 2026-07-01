@@ -5,6 +5,7 @@ import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Plus } from "lucide
 import Link from "next/link";
 import { Input } from "../ui/input";
 import FashionMoodboard from "./FassionMoodBoard";
+import SearchInput from "../searchInput/SearchInput";
 
 const items = Array.from({ length: 9 }).map((_, i) => i);
 const cats = ['All','Men', 'Women','Kid']
@@ -19,11 +20,16 @@ export default function HomeScreen() {
   return (
     <div className="flex flex-col gap-20 pt-10 min-h-screen">
       <div className="flex flex-col ">
-        <div className="w-48 gap-1 flex flex-col justify-center">
+        <div className="w-64 gap-1 flex flex-col justify-center">
           <Link href="/mem">MEM</Link>
           <Link href="/wOMEM">WOMEM</Link>
           <Link href="/kids">KIDS</Link>
-          <Input placeholder="Enter text" className="rounded-[3px]" />
+          <SearchInput
+            placeholder="Enter text"
+            query={""}
+            setQuery={()=>{}}
+            setPage={()=>{}}
+          />
         </div>
       </div>
       {/* Carosel 1 */}
