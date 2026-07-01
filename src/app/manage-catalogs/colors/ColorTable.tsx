@@ -241,7 +241,7 @@ const ColorTable = ({ catalogType, setCatalogType }: Props) => {
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="h-50 overflow-x-auto">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
