@@ -3,6 +3,8 @@ import {
   IBrand,
   ICatagory,
   ICollection,
+  IColor,
+  ISize,
 } from "@/store/slices/catalogSlice";
 
 export const convertToTitleCase = (str: string) => {
@@ -61,5 +63,25 @@ export const availabilityName = (
 
   if (availability) {
     return availability.availability_name;
+  }
+};
+
+export const colorName = (id: number | undefined, colors: IColor[]) => {
+  if (!id) return;
+
+  const color = colors.find((item) => item.color_id === id);
+
+  if (color) {
+    return color.color_name;
+  }
+};
+
+export const sizeName = (id: number | undefined, sizes: ISize[]) => {
+  if (!id) return;
+
+  const size = sizes.find((item) => item.size_id === id);
+
+  if (size) {
+    return size.size_name;
   }
 };

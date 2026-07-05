@@ -37,6 +37,7 @@ export default function CatalogProvider({
       // Genders
       const gendersRes = await fetch("/api/genders");
       const gendersData = await gendersRes.json();
+      console.log(gendersData, "genderData");
       // Genders
       const availabilitiesRes = await fetch("/api/availabilities");
       const availabilitiesData = await availabilitiesRes.json();

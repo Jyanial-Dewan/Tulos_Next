@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import {
   Field,
   FieldError,
@@ -21,17 +21,20 @@ import {
 } from "@/components/ui/select";
 import { useAppSelector } from "@/hooks/useAppStore";
 import { Spinner } from "@/components/ui/spinner";
-import { useSearchParams } from "next/navigation";
 import { loadData, postData, putData } from "@/utility/httpRequest";
 import { endpoints } from "@/variables/variables";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { IProduct, IProductTags } from "@/store/slices/productSlice";
+import { convertToTitleCase } from "@/utility/general";
 
 interface Props {
-  setProductId: React.Dispatch<React.SetStateAction<number | null>>;
+  setProduct?: React.Dispatch<React.SetStateAction<IProduct | undefined>>;
+  action: string;
+  product?: IProduct | undefined;
 }
 
-const SizeSchema = z.object({
+const ProductSchema = z.object({
   product_name: z.string().min(1, "Product name is required"),
   description: z.string().min(1, "Description is required"),
   catagory_id: z.string().min(1, "Category is required"),
@@ -40,20 +43,31 @@ const SizeSchema = z.object({
   gender_id: z.string().min(1, "Gender is required"),
   availability_id: z.string().min(1, "Availability is required"),
   tag_ids: z.array(z.number()).optional(),
+  color_ids: z.array(z.number()).optional(),
+  size_ids: z.array(z.number()).optional(),
+  price: z.number().positive().optional(),
+  stock: z.number().min(1).optional(),
 });
 
-const AddEditProduct = ({ setProductId }: Props) => {
-  const searchParams = useSearchParams();
-  const product_id = Number(searchParams.get("product_id"));
-  const { catagories, collections, brands, tags, genders, availabilities } =
-    useAppSelector((state) => state.catalog);
-  const [isLoading, setIsLoading] = useState(false);
+const AddEditProduct = ({ setProduct, action, product }: Props) => {
+  const {
+    catagories,
+    collections,
+    brands,
+    tags,
+    genders,
+    availabilities,
+    colors,
+    sizes,
+  } = useAppSelector((state) => state.catalog);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [productTags, setProductTags] = useState<IProductTags[]>([]);
+  type productForm = z.infer<typeof ProductSchema>;
 
-  type sizeForm = z.infer<typeof SizeSchema>;
-
-  const form = useForm<sizeForm>({
-    resolver: zodResolver(SizeSchema),
+  const form = useForm<productForm>({
+    resolver: zodResolver(ProductSchema),
     defaultValues: {
       product_name: "",
       description: "",
@@ -63,30 +77,34 @@ const AddEditProduct = ({ setProductId }: Props) => {
       gender_id: "",
       availability_id: "",
       tag_ids: [],
+      color_ids: [],
+      size_ids: [],
+      price: 0,
+      stock: 1,
     },
   });
 
+  const category = useWatch({
+    control: form.control,
+    name: "catagory_id",
+  });
+
+  const categoryId = Number(category);
+
+  const eligibleSizes = sizes.filter((item) => item.catagory_id === categoryId);
+
   useEffect(() => {
-    if (product_id) {
-      const fetchProduct = async () => {
-        const res = await loadData({
-          url: `${endpoints.Products}?product_id=${product_id}`,
-          setLoading: setIsLoading,
-          //   accessToken: token.access_token,
-        });
-
-        form.reset({
-          product_name: res?.data.result.product_name,
-          description: res?.data.result.description,
-          catagory_id: String(res?.data.result.catagory_id),
-          brand_id: String(res?.data.result.brand_id),
-          collection_id: String(res?.data.result.collection_id),
-          gender_id: String(res?.data.result.gender_id),
-          availability_id: String(res?.data.result.availability_id),
-        });
-      };
-
-      fetchProduct();
+    if (action === "edit" && product && productTags) {
+      form.reset({
+        product_name: product.product_name,
+        description: product.description,
+        catagory_id: String(product.catagory_id),
+        brand_id: String(product.brand_id),
+        collection_id: String(product.collection_id),
+        gender_id: String(product.gender_id),
+        availability_id: String(product.availability_id),
+        tag_ids: productTags.map((item) => item.tag_id),
+      });
     } else {
       form.reset({
         product_name: "",
@@ -97,11 +115,33 @@ const AddEditProduct = ({ setProductId }: Props) => {
         gender_id: "",
         availability_id: "",
         tag_ids: [],
+        color_ids: [],
+        size_ids: [],
+        price: 0,
+        stock: 1,
       });
     }
-  }, [form, product_id]);
+  }, [action, product, form, productTags]);
 
-  const onSubmit = async (data: sizeForm) => {
+  useEffect(() => {
+    if (product?.product_id) {
+      const fetchProductTags = async () => {
+        const res = await loadData({
+          url: `${endpoints.ProductTags}?product_id=${product.product_id}`,
+          setLoading: setIsLoading,
+          //   accessToken: token.access_token,
+        });
+        console.log(res);
+        if (res?.status == 200) {
+          setProductTags(res.data.result);
+        }
+      };
+
+      fetchProductTags();
+    }
+  }, [product?.product_id]);
+
+  const onSubmit = async (data: productForm) => {
     const payload = {
       ...data,
       catagory_id: Number(data.catagory_id),
@@ -111,7 +151,7 @@ const AddEditProduct = ({ setProductId }: Props) => {
       availability_id: Number(data.availability_id),
     };
 
-    if (!product_id) {
+    if (action === "add") {
       const params = {
         url: `${endpoints.Products}`,
         setLoading: setIsSubmitting,
@@ -122,25 +162,12 @@ const AddEditProduct = ({ setProductId }: Props) => {
       const res = await postData(params);
       console.log(res);
       if (res?.status === 201) {
-        setProductId(res.data.result.product_id);
+        if (setProduct) setProduct(res.data.result);
         form.reset();
-        // const tagRes = await postData({
-        //   url: `${endpoints.ProductTags}`,
-        //   setLoading: setIsSubmitting,
-        //   payload: {
-        //     product_id: Number(res.data.result.product_id),
-        //     tag_ids: data.tag_ids,
-        //   },
-        //   isToast: true,
-        // });
-        // console.log(tagRes);
-        // if (tagRes?.status === 201) {
-
-        // }
       }
     } else {
       const params = {
-        url: `${endpoints.Products}?product_id=${product_id}`,
+        url: `${endpoints.Products}?product_id=${product?.product_id}`,
         setLoading: setIsSubmitting,
         payload,
         isToast: true,
@@ -156,7 +183,7 @@ const AddEditProduct = ({ setProductId }: Props) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Add Product</CardTitle>
+        <CardTitle>{convertToTitleCase(action)} Product</CardTitle>
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground">
         {isLoading ? (
@@ -270,7 +297,7 @@ const AddEditProduct = ({ setProductId }: Props) => {
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger aria-invalid={fieldState.invalid}>
-                          <SelectValue placeholder="Select a category" />
+                          <SelectValue placeholder="Select a collection" />
                         </SelectTrigger>
 
                         <SelectContent>
@@ -304,7 +331,7 @@ const AddEditProduct = ({ setProductId }: Props) => {
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger aria-invalid={fieldState.invalid}>
-                          <SelectValue placeholder="Select a category" />
+                          <SelectValue placeholder="Select a gender" />
                         </SelectTrigger>
 
                         <SelectContent>
@@ -338,7 +365,7 @@ const AddEditProduct = ({ setProductId }: Props) => {
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger aria-invalid={fieldState.invalid}>
-                          <SelectValue placeholder="Select a category" />
+                          <SelectValue placeholder="Select an availability" />
                         </SelectTrigger>
 
                         <SelectContent>
@@ -359,32 +386,64 @@ const AddEditProduct = ({ setProductId }: Props) => {
                     </Field>
                   )}
                 />
-                {/* Description */}
-                <Controller
-                  name="description"
-                  control={form.control}
-                  render={({ field, fieldState }) => (
-                    <Field
-                      data-invalid={fieldState.invalid}
-                      className="col-span-2"
-                    >
-                      <FieldLabel htmlFor="description">Description</FieldLabel>
-
-                      <Textarea
-                        {...field}
-                        id="description"
-                        aria-invalid={fieldState.invalid}
-                        placeholder="The Nike SB Heritage Vulc combines..."
-                        autoComplete="off"
-                        rows={2}
-                      />
-
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
+                {/* Price */}
+                {action === "add" && (
+                  <Controller
+                    name="price"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="form-rhf-demo-title">
+                          Price
+                        </FieldLabel>
+                        <Input
+                          {...field}
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
+                          id="form-rhf-demo-title"
+                          aria-invalid={fieldState.invalid}
+                          placeholder="11.00"
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                )}
+                {/* Stock */}
+                {action === "add" && (
+                  <Controller
+                    name="stock"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <FieldLabel htmlFor="form-rhf-demo-title">
+                          Stock
+                        </FieldLabel>
+                        <Input
+                          {...field}
+                          type="number"
+                          value={field.value}
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
+                          id="form-rhf-demo-title"
+                          aria-invalid={fieldState.invalid}
+                          placeholder="10"
+                          autoComplete="off"
+                        />
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                )}
 
                 {/* Tags */}
                 <Controller
@@ -425,6 +484,131 @@ const AddEditProduct = ({ setProductId }: Props) => {
                           </div>
                         ))}
                       </div>
+
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+
+                {/* Colors */}
+                {action === "add" && (
+                  <Controller
+                    name="color_ids"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field
+                        data-invalid={fieldState.invalid}
+                        className="col-span-2"
+                      >
+                        <FieldLabel>Colors</FieldLabel>
+
+                        <div className="flex flex-wrap items-center gap-3 rounded-md border p-2">
+                          {colors.map((color) => (
+                            <div
+                              key={color.color_id}
+                              className="flex items-center gap-1"
+                            >
+                              <Checkbox
+                                checked={field.value?.includes(color.color_id)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    field.onChange([
+                                      ...(field.value ?? []),
+                                      color.color_id,
+                                    ]);
+                                  } else {
+                                    field.onChange(
+                                      field.value?.filter(
+                                        (id) => id !== color.color_id,
+                                      ),
+                                    );
+                                  }
+                                }}
+                              />
+
+                              <label>{color.color_name}</label>
+                            </div>
+                          ))}
+                        </div>
+
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                )}
+
+                {/* Sizes */}
+                {action === "add" && (
+                  <Controller
+                    name="size_ids"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                      <Field
+                        data-invalid={fieldState.invalid}
+                        className="col-span-2"
+                      >
+                        <FieldLabel>Sizes</FieldLabel>
+
+                        <div className="flex flex-wrap items-center gap-3 rounded-md border p-2">
+                          {eligibleSizes.map((size) => (
+                            <div
+                              key={size.size_id}
+                              className="flex items-center gap-1"
+                            >
+                              <Checkbox
+                                checked={field.value?.includes(size.size_id)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    field.onChange([
+                                      ...(field.value ?? []),
+                                      size.size_id,
+                                    ]);
+                                  } else {
+                                    field.onChange(
+                                      field.value?.filter(
+                                        (id) => id !== size.size_id,
+                                      ),
+                                    );
+                                  }
+                                }}
+                              />
+
+                              <label>{size.size_name}</label>
+                            </div>
+                          ))}
+                        </div>
+
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                )}
+
+                {/* Description */}
+                <Controller
+                  name="description"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field
+                      data-invalid={fieldState.invalid}
+                      className="col-span-2"
+                    >
+                      <FieldLabel htmlFor="description">Description</FieldLabel>
+
+                      <Textarea
+                        {...field}
+                        id="description"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="The Nike SB Heritage Vulc combines..."
+                        autoComplete="off"
+                        rows={2}
+                      />
 
                       {fieldState.invalid && (
                         <FieldError errors={[fieldState.error]} />

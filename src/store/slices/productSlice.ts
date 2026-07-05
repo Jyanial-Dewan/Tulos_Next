@@ -13,6 +13,24 @@ export interface IProduct {
   updated_at: Date;
 }
 
+export interface IProductVariant {
+  variant_id: number;
+  product_id: number;
+  color_id?: number;
+  size_id?: number;
+  sku: string;
+  barcode?: string;
+  price: number;
+  stock?: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface IProductTags {
+  product_id: number;
+  tag_id: number;
+}
+
 interface ProductSliceState {
   products: IProduct[];
 }

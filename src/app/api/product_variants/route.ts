@@ -33,18 +33,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const {
-    product_id,
-    colors,
-    sizes,
-    price,
-    compare_at_price,
-    cost_price,
-    stock,
-    weight,
-  } = body;
+  const { product_id, color_ids, size_ids, price, stock } = body;
   try {
-    if (!product_id || !colors || !sizes) {
+    if (!product_id || !color_ids || !size_ids) {
       return NextResponse.json(
         { message: "Product id, colors and sizes are required" },
         { status: 422 },
@@ -52,8 +43,8 @@ export async function POST(req: Request) {
     }
     const variants = [];
 
-    for (const color_id of colors) {
-      for (const size_id of sizes) {
+    for (const color_id of color_ids) {
+      for (const size_id of size_ids) {
         variants.push({
           product_id: Number(product_id),
           color_id: Number(color_id),
@@ -61,10 +52,7 @@ export async function POST(req: Request) {
           sku: `${product_id}_${color_id}_${size_id}`,
           barcode: null,
           price,
-          compare_at_price,
-          cost_price,
           stock,
-          weight,
         });
       }
     }
@@ -150,10 +138,7 @@ export async function PUT(req: Request) {
                 sku: variant.sku,
                 barcode: variant.barcode,
                 price: variant.price,
-                compare_at_price: variant.compare_at_price,
-                cost_price: variant.cost_price,
                 stock: variant.stock,
-                weight: variant.weight,
               },
             }),
           ),
@@ -169,10 +154,7 @@ export async function PUT(req: Request) {
           sku: variant.sku,
           barcode: variant.barcode,
           price: variant.price,
-          compare_at_price: variant.compare_at_price,
-          cost_price: variant.cost_price,
           stock: variant.stock,
-          weight: variant.weight,
         }));
 
       if (newVariants.length > 0) {
