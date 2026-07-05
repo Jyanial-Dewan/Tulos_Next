@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { current } from "@reduxjs/toolkit";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -89,6 +90,10 @@ export async function POST(req: Request) {
     gender_id,
     availability_id,
     tag_ids,
+    color_ids,
+    size_ids,
+    price,
+    stock,
   } = body;
   try {
     if (!product_name || !catagory_id || !availability_id) {
@@ -136,8 +141,31 @@ export async function POST(req: Request) {
           },
         });
       }
-    }
 
+      const colors = color_ids && color_ids.length > 0 ? color_ids : [null];
+
+      const sizes = size_ids && size_ids.length > 0 ? size_ids : [null];
+
+      const variants = [];
+
+      for (const color_id of colors) {
+        for (const size_id of sizes) {
+          variants.push({
+            product_id: result.product_id,
+            color_id: color_id ? Number(color_id) : null,
+            size_id: size_id ? Number(size_id) : null,
+            sku: `${result.product_id}_${color_id ?? "NA"}_${size_id ?? "NA"}`,
+            barcode: null,
+            price,
+            stock,
+          });
+        }
+      }
+
+      await prisma.product_variants.createMany({
+        data: variants,
+      });
+    }
     return NextResponse.json(
       { result, message: "Product added" },
       { status: 201 },
@@ -159,6 +187,7 @@ export async function PUT(req: Request) {
     collection_id,
     gender_id,
     availability_id,
+    tag_ids,
   } = body;
   try {
     if (!productId) {
@@ -182,7 +211,12 @@ export async function PUT(req: Request) {
     }
 
     const productName = await prisma.products.findFirst({
-      where: { product_name },
+      where: {
+        product_name,
+        NOT: {
+          product_id: Number(productId),
+        },
+      },
     });
     if (productName) {
       return NextResponse.json(
@@ -205,6 +239,44 @@ export async function PUT(req: Request) {
         availability_id: Number(availability_id),
       },
     });
+
+    if (result && tag_ids) {
+      const currentTags = await prisma.product_tags.findMany({
+        where: {
+          product_id: Number(productId),
+        },
+      });
+
+      const currentTagIds = currentTags.map((item) => item.tag_id);
+
+      const toAddTags = tag_ids.filter(
+        (item: number) => !currentTagIds.includes(item),
+      );
+
+      for (const tag of toAddTags) {
+        await prisma.product_tags.create({
+          data: {
+            product_id: Number(productId),
+            tag_id: Number(tag),
+          },
+        });
+      }
+
+      const toDeleteTags = currentTags.filter(
+        (item) => !tag_ids.includes(item.tag_id),
+      );
+
+      for (const t of toDeleteTags) {
+        await prisma.product_tags.delete({
+          where: {
+            product_id_tag_id: {
+              product_id: Number(productId),
+              tag_id: Number(t.tag_id),
+            },
+          },
+        });
+      }
+    }
 
     return NextResponse.json(
       { result, message: "Product edited" },

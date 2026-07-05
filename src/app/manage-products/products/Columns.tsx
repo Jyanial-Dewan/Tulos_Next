@@ -4,10 +4,9 @@ import {
   ICollection,
 } from "@/store/slices/catalogSlice";
 import { IProduct } from "@/store/slices/productSlice";
-import { availabilityName, brandName, collectionName } from "@/utility/general";
+import { availabilityName } from "@/utility/general";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, View } from "lucide-react";
-import Link from "next/link";
+import { ArrowUpDown } from "lucide-react";
 export const getColumns = (
   brands: IBrand[],
   collections: ICollection[],
