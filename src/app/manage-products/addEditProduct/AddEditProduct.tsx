@@ -183,7 +183,22 @@ const AddEditProduct = ({ setProduct, action, product }: Props) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{convertToTitleCase(action)} Product</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          <p>{convertToTitleCase(action)} Product</p>
+          <div className="flex gap-3 items-center">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => form.reset()}
+            >
+              Reset
+            </Button>
+            <Button type="submit" form="form-rhf-demo" disabled={isSubmitting}>
+              {isSubmitting && <Spinner />}
+              Submit
+            </Button>
+          </div>
+        </CardTitle>
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground">
         {isLoading ? (
@@ -618,24 +633,6 @@ const AddEditProduct = ({ setProduct, action, product }: Props) => {
                 />
               </FieldGroup>
             </form>
-
-            <Field orientation="horizontal" className="flex justify-end mt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => form.reset()}
-              >
-                Reset
-              </Button>
-              <Button
-                type="submit"
-                form="form-rhf-demo"
-                disabled={isSubmitting}
-              >
-                {isSubmitting && <Spinner />}
-                Submit
-              </Button>
-            </Field>
           </div>
         )}
       </CardContent>
