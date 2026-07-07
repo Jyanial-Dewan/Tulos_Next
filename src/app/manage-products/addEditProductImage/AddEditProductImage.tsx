@@ -56,11 +56,12 @@ const AddEditProductImage = ({ product }: Props) => {
     if (product?.product_id) {
       const fetchProductImages = async () => {
         const params = {
-          url: `${endpoints.Products}?product_id=${product.product_id}`,
+          url: `${endpoints.ProductImages}?product_id=${product.product_id}`,
           setLoading: setLoading,
         };
 
         const res = await loadData(params);
+        console.log(res, "images");
         if (res?.status === 200) {
           setQueue(
             res.data.result.map((img: any) => ({
