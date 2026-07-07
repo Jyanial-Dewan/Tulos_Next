@@ -1,5 +1,5 @@
 [build]
-  command = "npx prisma generate && next build"
+  command = "npx prisma generate && yarn install && yarn build"
   publish = ".next"
 
 [[plugins]]
