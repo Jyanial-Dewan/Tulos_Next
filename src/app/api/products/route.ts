@@ -63,7 +63,7 @@ export async function GET(req: Request) {
     }
 
     // Get all products (with optional search)
-    const result = await prisma.products.findMany({
+    const result = await prisma.productView.findMany({
       where,
     });
 
