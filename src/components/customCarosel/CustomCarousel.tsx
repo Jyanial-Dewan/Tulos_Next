@@ -38,7 +38,7 @@ function resolveItemsPerScroll(count: ItemsPerScroll, containerWidth: number): n
   return count.sm ?? 1;
 }
 
-export default function Carousel<T,>({
+export default function CustomCarousel<T,>({
   items,
   renderItem,
   itemClass = "min-w-[45%] md:min-w-[30%] lg:min-w-[23.5%]",
