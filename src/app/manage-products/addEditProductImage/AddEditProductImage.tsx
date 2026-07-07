@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { IProduct } from "@/store/slices/productSlice";
 import { useEffect, useRef, useState } from "react";
 import ImageCropModal from "./ImageCropModal";
@@ -9,6 +15,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { endpoints } from "@/variables/variables";
 import { deleteData, loadData } from "@/utility/httpRequest";
 import { toast } from "sonner";
+import { convertToTitleCase } from "@/utility/general";
 
 const MAX_IMAGES = 3;
 const MAX_SIZE = 1 * 1024 * 1024;
@@ -46,25 +53,27 @@ const AddEditProductImage = ({ product }: Props) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const fetchProductImages = async () => {
-      const params = {
-        url: `${endpoints.ProductImages}?product_id=${product?.product_id}`,
-        setLoading: setLoading,
-      };
+    if (product?.product_id) {
+      const fetchProductImages = async () => {
+        const params = {
+          url: `${endpoints.ProductImages}?product_id=${product.product_id}`,
+          setLoading: setLoading,
+        };
 
-      const res = await loadData(params);
-      if (res?.status === 200) {
-        setQueue(
-          res.data.result.map((img: any) => ({
-            type: "existing",
-            id: `existing-${img.image_id}`,
-            imageId: img.image_id,
-            previewUrl: img.image_url, // this is a real path like /uploads/products/xxx.jpg — works directly in <img>/<Image>
-          })),
-        );
-      }
-    };
-    fetchProductImages();
+        const res = await loadData(params);
+        if (res?.status === 200) {
+          setQueue(
+            res.data.result.map((img: any) => ({
+              type: "existing",
+              id: `existing-${img.image_id}`,
+              imageId: img.image_id,
+              previewUrl: img.image_url, // this is a real path like /uploads/products/xxx.jpg — works directly in <img>/<Image>
+            })),
+          );
+        }
+      };
+      fetchProductImages();
+    }
   }, [product?.product_id]);
 
   const remainingSlots = MAX_IMAGES - queue.length;
@@ -200,7 +209,7 @@ const AddEditProductImage = ({ product }: Props) => {
       newItems.forEach((q) => formData.append("image", q.file));
 
       const res = await fetch(
-        `/api/${endpoints.ProductImages}?product_id=${product?.product_id}`,
+        `/api${endpoints.ProductImages}?product_id=${product?.product_id}`,
         {
           method: "POST",
           body: formData,
@@ -251,6 +260,10 @@ const AddEditProductImage = ({ product }: Props) => {
             </Button>
           )}
         </CardTitle>
+        <CardDescription>
+          Product Name: {` `}
+          {convertToTitleCase(product?.product_name as string)}
+        </CardDescription>
       </CardHeader>
       <CardContent className="text-sm text-muted-foreground">
         {loading ? (

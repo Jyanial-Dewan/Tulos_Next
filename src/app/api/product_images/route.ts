@@ -26,7 +26,7 @@ export async function GET(req: Request) {
     });
 
     if (!result) {
-      return NextResponse.json({ message: "No tags found" }, { status: 409 });
+      return NextResponse.json({ message: "No images found" }, { status: 409 });
     }
 
     return NextResponse.json({ result });

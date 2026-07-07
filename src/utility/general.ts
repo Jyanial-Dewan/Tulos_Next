@@ -7,7 +7,8 @@ import {
   ISize,
 } from "@/store/slices/catalogSlice";
 
-export const convertToTitleCase = (str: string) => {
+export const convertToTitleCase = (str: string | undefined) => {
+  if (!str) return;
   // convert "profile_type_one" to 'Profile Type One'
   return str
     .split("_")
