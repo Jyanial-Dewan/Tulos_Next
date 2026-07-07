@@ -3,7 +3,7 @@
 import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import Link from "next/link";
 import FashionMoodboard from "./FassionMoodBoard";
-import Carousel from "../customCarosel/CustomCarousel";
+import CustomCarousel from "../customCarosel/CustomCarousel";
 import SearchInput from "../searchInput/SearchInput";
 import { useRef, useState } from "react";
 
@@ -12,13 +12,17 @@ const cats = ['All', 'Men', 'Women', 'Kid']
 
 export default function HomeScreen() {
   const desktopScroll = useRef<((direction: 1 | -1) => void) | null>(null);
-  const [desktopCanScrollLeft, setDesktopCanScrollLeft] = useState(false);
-  const [desktopCanScrollRight, setDesktopCanScrollRight] = useState(true);
+  const [canScrollLeft1, setCanScrollLeft1] = useState(false);
+  const [canScrollRight1, setCanScrollRight1] = useState(true);
+  const [canScrollLeftMob, setCanScrollLeftMob] = useState(false);
+  const [canScrollRightMob, setCanScrollRightMob] = useState(true);
+  const [canScrollLeft2, setCanScrollLeft2] = useState(false);
+  const [canScrollRight2, setCanScrollRight2] = useState(true);
 
   return (
     <div className="flex flex-col gap-20 pt-10 min-h-screen">
       <div className="flex flex-col ">
-        <div className="w-64 gap-1 flex flex-col justify-center">
+        <div className="w-full md:w-64 gap-1 flex flex-col justify-center">
           <Link href="/mem">MEM</Link>
           <Link href="/wOMEM">WOMEM</Link>
           <Link href="/kids">KIDS</Link>
@@ -41,15 +45,15 @@ export default function HomeScreen() {
           </div>
           <div className="flex flex-col gap-4 md:flex-row">
             {/* For mobile */}
-            <Carousel
+            <CustomCarousel
               items={items}
               itemClass="w-[50%] col-span-1 md:hidden"
               containerClass="h-48 md:h-full"
               showButtons={false}
-              canScrollLeft={desktopCanScrollLeft}
-              setCanScrollLeft={setDesktopCanScrollLeft}
-              canScrollRight={desktopCanScrollRight}
-              setCanScrollRight={setDesktopCanScrollRight}
+              canScrollLeft={canScrollLeftMob}
+              setCanScrollLeft={setCanScrollLeftMob}
+              canScrollRight={canScrollRightMob}
+              setCanScrollRight={setCanScrollRightMob}
               itemsPerScroll={{ sm: 1 }}
               renderItem={(item) => (
                 <div className="bg-amber-200 h-full flex items-center justify-center">{item}</div>
@@ -58,16 +62,17 @@ export default function HomeScreen() {
             <div className="flex w-full h-10 items-center justify-between bg-[#cdcdcd] px-5 py-1">
               <Link href="/kids">Go To Shop</Link> <ArrowRight />
             </div>
+            {/* Next and Previous button */}
             <div className="md:gap-2 hidden md:flex">
               <button
-                disabled={!desktopCanScrollLeft}
+                disabled={!canScrollLeft1}
                 onClick={() => desktopScroll.current?.(-1)}
                 className="w-10 h-10 border border-gray-200 flex items-center justify-center cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition"
               >
                 <ChevronLeft />
               </button>
               <button
-                disabled={!desktopCanScrollRight}
+                disabled={!canScrollRight1}
                 onClick={() => desktopScroll.current?.(1)}
                 className="w-10 h-10 border border-gray-200 flex items-center justify-center cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-100 transition"
               >
@@ -77,15 +82,16 @@ export default function HomeScreen() {
           </div>
         </div>
         <div className="col-span-1 md:col-span-1 lg:col-span-2 xl:col-span-3 hidden md:block">
-          <Carousel
+          {/* Upper mobile device carousel */}
+          <CustomCarousel
             items={items}
             itemClass="md:min-w-[80%] lg:min-w-[49%] xl:min-w-[32%]"
             containerClass="h-48 md:h-full"
             showButtons={false}
-            canScrollLeft={desktopCanScrollLeft}
-            setCanScrollLeft={setDesktopCanScrollLeft}
-            canScrollRight={desktopCanScrollRight}
-            setCanScrollRight={setDesktopCanScrollRight}
+            canScrollLeft={canScrollLeft1}
+            setCanScrollLeft={setCanScrollLeft1}
+            canScrollRight={canScrollRight1}
+            setCanScrollRight={setCanScrollRight1}
             itemsPerScroll={{ md: 1, lg: 2, xl: 3 }}
             scrollRef={desktopScroll}
             renderItem={(item) => (
@@ -106,15 +112,15 @@ export default function HomeScreen() {
             <Link href='/'>See All</Link>
           </div>
         </div>
-        <Carousel
+        <CustomCarousel
           items={items}
           itemClass='min-w-[45%] md:min-w-[30%] lg:min-w-[23.5%]'
           containerClass="h-full"
           showButtons={true}
-          canScrollLeft={desktopCanScrollLeft}
-          setCanScrollLeft={setDesktopCanScrollLeft}
-          canScrollRight={desktopCanScrollRight}
-          setCanScrollRight={setDesktopCanScrollRight}
+          canScrollLeft={canScrollLeft2}
+          setCanScrollLeft={setCanScrollLeft2}
+          canScrollRight={canScrollRight2}
+          setCanScrollRight={setCanScrollRight2}
           itemsPerScroll={{ sm: 1, md: 1, lg: 3, xl: 4 }}
           renderItem={(item) => (
             <div className="">
