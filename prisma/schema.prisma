@@ -132,3 +132,19 @@ model products {
   collections      collections?       @relation(fields: [collection_id], references: [collection_id], onDelete: NoAction, onUpdate: NoAction)
   genders          genders?           @relation(fields: [gender_id], references: [gender_id], onDelete: NoAction, onUpdate: NoAction)
 }
+
+model ProductView {
+  product_id      Int      @id
+  product_name    String
+  description     String?
+  catagory_id     Int
+  brand_id        Int?
+  collection_id   Int?
+  gender_id       Int?
+  availability_id Int?
+  created_at      DateTime
+  updated_at      DateTime
+  image_urls      Json
+
+  @@map("product_view")
+}

@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/db";
-import { current } from "@reduxjs/toolkit";
 import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
@@ -13,7 +12,7 @@ export async function GET(req: Request) {
   try {
     // Get a single product by ID
     if (productId) {
-      const result = await prisma.products.findUnique({
+      const result = await prisma.productView.findUnique({
         where: {
           product_id: Number(productId),
         },
@@ -44,11 +43,11 @@ export async function GET(req: Request) {
       const pageNumber = Number(page);
       const limitNumber = Number(limit);
 
-      const total = await prisma.products.count({
+      const total = await prisma.productView.count({
         where,
       });
 
-      const result = await prisma.products.findMany({
+      const result = await prisma.productView.findMany({
         where,
         skip: (pageNumber - 1) * limitNumber,
         take: limitNumber,

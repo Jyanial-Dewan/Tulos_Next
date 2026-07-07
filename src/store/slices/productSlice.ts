@@ -11,6 +11,7 @@ export interface IProduct {
   availability_id: number;
   created_at: Date;
   updated_at: Date;
+  image_urls: string[];
 }
 
 export interface IProductVariant {

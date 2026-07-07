@@ -56,7 +56,7 @@ const AddEditProductImage = ({ product }: Props) => {
     if (product?.product_id) {
       const fetchProductImages = async () => {
         const params = {
-          url: `${endpoints.ProductImages}?product_id=${product.product_id}`,
+          url: `${endpoints.Products}?product_id=${product.product_id}`,
           setLoading: setLoading,
         };
 
