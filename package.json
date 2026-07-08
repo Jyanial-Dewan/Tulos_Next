@@ -10,10 +10,10 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
-    "@img/sharp-win32-x64": "^0.35.3",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@reduxjs/toolkit": "^2.12.0",
+    "@tailwindcss/line-clamp": "^0.4.4",
     "@tanstack/react-table": "^8.21.3",
     "axios": "^1.18.1",
     "bcryptjs": "^3.0.3",
@@ -49,5 +49,10 @@
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "_comment":"Below things for only the Netlify, If you working on the Local Machine then remove it",
+  "optionalDependencies": {
+    "@img/sharp-linux-x64": "^0.35.3",
+    "@img/sharp-win32-x64": "^0.35.3"
   }
 }

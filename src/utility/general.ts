@@ -86,3 +86,13 @@ export const sizeName = (id: number | undefined, sizes: ISize[]) => {
     return size.size_name;
   }
 };
+
+// export const productPriceRange = (id: number | undefined, sizes: ISize[]) => {
+//   if (!id) return;
+
+//   const size = sizes.find((item) => item.size_id === id);
+
+//   if (size) {
+//     return size.size_name;
+//   }
+// };
