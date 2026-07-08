@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface IProduct {
   product_id: number;
@@ -43,9 +43,13 @@ const initialState: ProductSliceState = {
 export const productSlice = createSlice({
   name: "products",
   initialState,
-  reducers: {},
+  reducers: {
+    setProducts: (state, action: PayloadAction<IProduct[]>) => {
+      state.products = action.payload;
+    },
+  },
 });
 
-export const {} = productSlice.actions;
+export const { setProducts } = productSlice.actions;
 
 export default productSlice.reducer;
