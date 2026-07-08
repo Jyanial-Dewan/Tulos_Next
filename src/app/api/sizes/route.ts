@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     }
 
     const size = await prisma.sizes.findFirst({
-      where: { size_name },
+      where: { size_name, catagory_id: Number(catagory_id) },
     });
     if (size) {
       return NextResponse.json(
@@ -93,14 +93,28 @@ export async function PUT(req: Request) {
       );
     }
 
-    const size = await prisma.sizes.findUnique({
-      where: {
-        size_id: Number(sizeId),
-      },
+    const size = await prisma.sizes.findFirst({
+      where: { size_name, catagory_id: Number(catagory_id) },
     });
 
     if (!size) {
       return NextResponse.json({ message: "No size found" }, { status: 409 });
+    }
+
+    const sizeName = await prisma.sizes.findFirst({
+      where: {
+        size_name,
+        catagory_id: Number(catagory_id),
+        NOT: {
+          size_id: Number(sizeId),
+        },
+      },
+    });
+    if (sizeName) {
+      return NextResponse.json(
+        { message: "Size name already exist." },
+        { status: 409 },
+      );
     }
 
     const result = await prisma.sizes.update({

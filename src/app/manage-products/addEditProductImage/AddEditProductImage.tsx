@@ -218,7 +218,7 @@ const AddEditProductImage = ({ product }: Props) => {
       );
 
       const data = await res.json();
-      console.log(data);
+      console.log(data, "221");
       if (res.ok) {
         toast(`${data.message}`);
       }
