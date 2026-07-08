@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/accordion"
 import Pagination from "@/components/pagination/Pagination";
 import { Slider } from "@/components/ui/slider"
+import FilterProduct from "../../components/filterProduct/FilterProduct";
+import { Filter, ListFilterPlus } from "lucide-react";
 
 
 export default function Products() {
@@ -160,7 +162,7 @@ export default function Products() {
   }, [page, limit, totalPage]);
   console.log(value)
   return <>
-    <div className="grid grid-cols-4 gap-4">
+    <div className="grid grid-cols-4 gap-6">
 
       {/* filters */}
       <div className="col-span-1 hidden md:block">
@@ -194,29 +196,14 @@ export default function Products() {
           </div>
         </div>
         <div className="border-b  border-gray-300" />
-
-        <div>
-          <Accordion
-            className="max-w-lg"
-            defaultValue={["billing"]}
-            type="multiple"
-          >
-            {accordionItems.map((item) => (
-              <AccordionItem
-                key={item.value}
-                value={item.value}
-                className="border-b px-0 last:border-b-0 "
-              >
-                <AccordionTrigger className="cursor-pointer">{item.trigger}</AccordionTrigger>
-                <AccordionContent>{item.content}</AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </div>
+        <FilterProduct items={accordionItems} />
       </div>
 
       {/* all products */}
       <div className="col-span-4 md:col-span-3">
+        <div className="md:hidden">
+          <ListFilterPlus />
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4  gap-6">
           {isLoading ?
             <div className="col-span-2 md:col-span-3 xl:col-span-4 grid place-items-center h-[80vh] w-full">
@@ -230,7 +217,7 @@ export default function Products() {
             </>
           }
         </div>
-        <div className="justify-self-end mt-6">
+        <div className="justify-center md:justify-self-end mt-6">
           <Pagination currentPage={page} setCurrentPage={setPage} totalPages={totalPage} />
         </div>
       </div>

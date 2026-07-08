@@ -10,7 +10,7 @@ interface CarouselProps {
 function ProductItem({ item, products = true }: CarouselProps) {
     const { catagories } = useAppSelector((state) => state.catalog);
     return (
-        <div className="cursor-pointer col-span-1 border">
+        <div className="cursor-pointer">
             <div className="flex items-center justify-center border relative">
                 {/* SVG fallback needs unoptimized — next/image can't optimize SVGs */}
                 <Image src={item.image_urls?.[0] ?? '/no-image.svg'} alt="Product Image" height={522} width={418} unoptimized={!item.image_urls?.[0]} />
