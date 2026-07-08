@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
+import sharp from "sharp";
 import path from "path";
 import crypto from "crypto";
 import { mkdir, unlink, writeFile } from "fs/promises";
@@ -130,7 +131,6 @@ export async function POST(req: Request) {
 
       const buffer = Buffer.from(await file.arrayBuffer());
 
-      const sharp = (await import("sharp")).default;
       const { width, height } = await sharp(buffer).metadata();
       if (!width || !height) {
         return NextResponse.json(

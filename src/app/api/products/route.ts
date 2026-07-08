@@ -5,6 +5,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
   const productId = searchParams.get("product_id");
+  const collectionId = searchParams.get("collection_id");
   const page = searchParams.get("page");
   const limit = searchParams.get("limit");
   const productName = searchParams.get("product_name");
@@ -15,6 +16,23 @@ export async function GET(req: Request) {
       const result = await prisma.productView.findUnique({
         where: {
           product_id: Number(productId),
+        },
+      });
+
+      if (!result) {
+        return NextResponse.json(
+          { message: "No product found" },
+          { status: 404 },
+        );
+      }
+
+      return NextResponse.json({ result });
+    }
+
+    if (collectionId) {
+      const result = await prisma.productView.findMany({
+        where: {
+          collection_id: Number(collectionId),
         },
       });
 
