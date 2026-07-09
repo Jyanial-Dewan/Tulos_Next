@@ -19,7 +19,6 @@ import { endpoints } from "@/variables/variables";
 import { loadData } from "@/utility/httpRequest";
 import Image from "next/image";
 import { TypeAnimation } from "react-type-animation";
-import { Button } from "../ui/button";
 
 const items = Array.from({ length: 9 }).map((_, i) => i);
 const cats = ["All", "Men", "Women", "Kid"];

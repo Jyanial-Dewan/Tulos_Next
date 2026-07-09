@@ -12,6 +12,8 @@ export interface IProduct {
   created_at: Date;
   updated_at: Date;
   image_urls: string[];
+  min_price?: number;
+  max_price?: number;
 }
 
 export interface IProductVariant {

@@ -5,6 +5,7 @@ import {
   ICollection,
   IColor,
   ISize,
+  ITag,
 } from "@/store/slices/catalogSlice";
 
 export const convertToTitleCase = (str: string | undefined) => {
@@ -84,6 +85,16 @@ export const sizeName = (id: number | undefined, sizes: ISize[]) => {
 
   if (size) {
     return size.size_name;
+  }
+};
+
+export const tagName = (id: number | undefined, sizes: ITag[]) => {
+  if (!id) return;
+
+  const tag = sizes.find((item) => item.tag_id === id);
+
+  if (tag) {
+    return tag.tag_name;
   }
 };
 

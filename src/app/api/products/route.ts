@@ -13,7 +13,7 @@ export async function GET(req: Request) {
   try {
     // Get a single product by ID
     if (productId) {
-      const result = await prisma.productView.findUnique({
+      const result = await prisma.product_view.findUnique({
         where: {
           product_id: Number(productId),
         },
@@ -30,7 +30,7 @@ export async function GET(req: Request) {
     }
 
     if (collectionId) {
-      const result = await prisma.productView.findMany({
+      const result = await prisma.product_view.findMany({
         where: {
           collection_id: Number(collectionId),
         },
@@ -61,14 +61,17 @@ export async function GET(req: Request) {
       const pageNumber = Number(page);
       const limitNumber = Number(limit);
 
-      const total = await prisma.productView.count({
+      const total = await prisma.product_view.count({
         where,
       });
 
-      const result = await prisma.productView.findMany({
+      const result = await prisma.product_view.findMany({
         where,
         skip: (pageNumber - 1) * limitNumber,
         take: limitNumber,
+        orderBy: {
+          created_at: "desc",
+        },
       });
 
       return NextResponse.json({
@@ -81,7 +84,7 @@ export async function GET(req: Request) {
     }
 
     // Get all products (with optional search)
-    const result = await prisma.productView.findMany({
+    const result = await prisma.product_view.findMany({
       where,
     });
 
