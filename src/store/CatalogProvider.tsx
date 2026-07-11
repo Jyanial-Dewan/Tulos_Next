@@ -1,6 +1,6 @@
 "use client";
 
-import { useAppDispatch } from "@/hooks/useAppStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/useAppStore";
 import { useEffect } from "react";
 import {
   setAvailabilities,
@@ -12,6 +12,8 @@ import {
   setSizes,
   setTags,
 } from "./slices/catalogSlice";
+import { endpoints } from "@/variables/variables";
+import { setCartItem } from "./slices/productSlice";
 
 export default function CatalogProvider({
   children,
@@ -19,6 +21,8 @@ export default function CatalogProvider({
   children: React.ReactNode;
 }) {
   const dispatch = useAppDispatch();
+  const { token } = useAppSelector((state) => state.user);
+  const { cartController } = useAppSelector((state) => state.product);
 
   useEffect(() => {
     const loadCatalogs = async () => {
@@ -37,7 +41,7 @@ export default function CatalogProvider({
       // Genders
       const gendersRes = await fetch("/api/genders");
       const gendersData = await gendersRes.json();
-      console.log(gendersData, "genderData");
+
       // Genders
       const availabilitiesRes = await fetch("/api/availabilities");
       const availabilitiesData = await availabilitiesRes.json();
@@ -47,6 +51,7 @@ export default function CatalogProvider({
       // Brands
       const sizesRes = await fetch("/api/sizes");
       const sizesData = await sizesRes.json();
+      // CartItems
 
       dispatch(setCatagories(categoryData.result));
       dispatch(setCollections(collectionsData.result));
@@ -60,6 +65,18 @@ export default function CatalogProvider({
 
     loadCatalogs();
   }, [dispatch]);
+
+  useEffect(() => {
+    const loadCartItems = async () => {
+      const cateItemsRes = await fetch(
+        `/api${endpoints.CartItems}?user_id=${token.user_id}`,
+      );
+      const cateItemsData = await cateItemsRes.json();
+
+      dispatch(setCartItem(cateItemsData.result));
+    };
+    loadCartItems();
+  }, [dispatch, token.user_id, cartController]);
 
   return children;
 }

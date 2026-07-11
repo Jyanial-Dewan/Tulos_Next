@@ -131,7 +131,7 @@ const AddEditProduct = ({ setProduct, action, product }: Props) => {
           setLoading: setIsLoading,
           //   accessToken: token.access_token,
         });
-        console.log(res);
+
         if (res?.status == 200) {
           setProductTags(res.data.result);
         }
@@ -160,7 +160,7 @@ const AddEditProduct = ({ setProduct, action, product }: Props) => {
         // accessToken: token.access_token,
       };
       const res = await postData(params);
-      console.log(res);
+
       if (res?.status === 201) {
         if (setProduct) setProduct(res.data.result);
         form.reset();

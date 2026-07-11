@@ -61,7 +61,7 @@ const AddEditProductImage = ({ product }: Props) => {
         };
 
         const res = await loadData(params);
-        console.log(res, "images");
+
         if (res?.status === 200) {
           setQueue(
             res.data.result.map((img: any) => ({
@@ -218,7 +218,7 @@ const AddEditProductImage = ({ product }: Props) => {
       );
 
       const data = await res.json();
-      console.log(data, "221");
+
       if (res.ok) {
         toast(`${data.message}`);
       }

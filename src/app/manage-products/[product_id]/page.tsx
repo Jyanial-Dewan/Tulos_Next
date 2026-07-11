@@ -15,8 +15,6 @@ const Page = () => {
   const productId = Number(params.product_id);
   const [product, setProduct] = useState<IProduct | undefined>(undefined);
 
-  console.log(productId);
-
   useEffect(() => {
     const fetchProduct = async () => {
       const res = await loadData({
@@ -24,7 +22,7 @@ const Page = () => {
         // setLoading: setIsLoading,
         //   accessToken: token.access_token,
       });
-      console.log(res);
+
       if (res?.status == 200) {
         setProduct(res.data.result);
       }

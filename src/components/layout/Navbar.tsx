@@ -8,6 +8,8 @@ import logo from "@/images/tulos_logo.png";
 import Dropdown from "../Topbar/Dropdown";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useAppSelector } from "@/hooks/useAppStore";
+import CartDropdown from "./CartDropdown";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -16,7 +18,7 @@ export default function Navbar() {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <nav className="py-3 bg-white sticky top-0 shadow-md z-10">
+    <nav className="h-16 bg-white sticky top-0 shadow-md z-10 flex itmes-center">
       <div className="w-[90%] mx-auto flex items-center justify-between">
         {/* Menu Button */}
         <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
@@ -34,10 +36,11 @@ export default function Navbar() {
             <Link
               key={link.name}
               href={link.href}
-              className={`px-3 py-1.5 rounded-md transition-all duration-300 ${isActive(link.href)
-                ? "text-orange-600 hover:text-orange-400 hover:scale-105"
-                : "hover:text-orange-400 hover:scale-105"
-                }`}
+              className={`px-3 py-1.5 rounded-md transition-all duration-300 ${
+                isActive(link.href)
+                  ? "text-orange-600 hover:text-orange-400 hover:scale-105"
+                  : "hover:text-orange-400 hover:scale-105"
+              }`}
             >
               {link.name}
             </Link>
@@ -49,9 +52,8 @@ export default function Navbar() {
           <Button asChild className="rounded-full cursor-pointer w-7 h-7 p-1.5">
             <Heart className="text-white" />
           </Button>
-          <Button asChild className="rounded-full cursor-pointer w-7 h-7 p-1.5">
-            <ShoppingBag className="text-white" />
-          </Button>
+          {/* Cart Button with Dropdown */}
+          <CartDropdown />
           <Dropdown>
             <Button
               asChild
@@ -73,8 +75,9 @@ export default function Navbar() {
 
       {/* Mobile Menu Drawer */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white z-30 transform transition-transform duration-300 ease-in-out md:hidden ${menuOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+        className={`fixed top-0 left-0 h-full w-64 bg-white z-30 transform transition-transform duration-300 ease-in-out md:hidden ${
+          menuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
       >
         <div className="flex justify-end p-4">
           <button onClick={() => setMenuOpen(false)}>
@@ -86,10 +89,11 @@ export default function Navbar() {
             <Link
               key={link.name}
               href={link.href}
-              className={`px-3 py-1.5 rounded-md transition-colors duration-300 ${isActive(link.href)
-                ? "text-orange-600 hover:text-orange-400 hover:scale-105"
-                : "hover:text-orange-400 hover:scale-105"
-                }`}
+              className={`px-3 py-1.5 rounded-md transition-colors duration-300 ${
+                isActive(link.href)
+                  ? "text-orange-600 hover:text-orange-400 hover:scale-105"
+                  : "hover:text-orange-400 hover:scale-105"
+              }`}
               onClick={() => setMenuOpen(false)}
             >
               {link.name}

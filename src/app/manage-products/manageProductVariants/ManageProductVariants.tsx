@@ -62,8 +62,6 @@ const ManageProductVariants = ({ product }: Props) => {
   const [isloaded, setIsloaded] = React.useState(false);
   const [action, setAction] = React.useState("");
 
-  console.log(selectedIds, data);
-
   const columns = React.useMemo(
     () => getColumns(colors, sizes),
     [colors, sizes],
