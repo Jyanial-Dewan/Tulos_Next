@@ -1,26 +1,33 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import { useAppSelector } from "@/hooks/useAppStore";
+import { useAppDispatch, useAppSelector } from "@/hooks/useAppStore";
 import {
+  cartControllerIncrease,
   IProduct,
   IProductTags,
   IProductVariant,
 } from "@/store/slices/productSlice";
 import { colorName, sizeName, tagName } from "@/utility/general";
-import { loadData } from "@/utility/httpRequest";
+import { loadData, postData } from "@/utility/httpRequest";
 import { endpoints } from "@/variables/variables";
-import { Plus } from "lucide-react";
+import { ChevronDown, ChevronLeft, Plus } from "lucide-react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const SingleProduct = () => {
   const { tags, colors, sizes } = useAppSelector((state) => state.catalog);
+  const { token } = useAppSelector((state) => state.user);
+  const { cartItems } = useAppSelector((state) => state.product);
+  const dispatch = useAppDispatch();
   const params = useParams<{ product_id: string }>();
   const productId = Number(params.product_id);
 
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [product, setProduct] = useState<IProduct | undefined>(undefined);
   const [productVariants, setProductVariants] = useState<IProductVariant[]>([]);
   const [productTags, setProductTags] = useState<IProductTags[]>([]);
@@ -28,6 +35,7 @@ const SingleProduct = () => {
   const [selectedVariant, setSelectedVariant] = useState<
     IProductVariant | undefined
   >(undefined);
+  const [fold, setFold] = useState(true);
 
   useEffect(() => {
     (async () => {
@@ -60,6 +68,33 @@ const SingleProduct = () => {
       }
     })();
   }, [productId]);
+
+  const handleAddtoCart = async () => {
+    if (!token.user_id) {
+      toast("Register/Login first.");
+
+      return;
+    }
+
+    const payload = {
+      user_id: token.user_id,
+      variant_id: selectedVariant?.variant_id,
+      quantity: 1,
+    };
+    const params = {
+      url: `${endpoints.CartItems}`,
+      setLoading: setSubmitting,
+      payload,
+      // isConsole?: boolean;
+      isToast: true,
+      // accessToken?: string;
+    };
+
+    const res = await postData(params);
+    if (res?.status === 201) {
+      dispatch(cartControllerIncrease());
+    }
+  };
 
   return (
     <>
@@ -107,62 +142,84 @@ const SingleProduct = () => {
           </div>
 
           {/* Description Section */}
-          <div className="col-span-5 md:col-span-2 md:max-h-[80vh] overflow-auto scrollbar-thin flex flex-col p-4">
-            <h1 className="text-2xl font-bold">{product?.product_name}</h1>
-            {/* Price */}
-            <div className="mt-6 flex gap-2 items-center text-gray-600 font-extrabold">
-              <p>$ {selectedVariant?.price}</p>
-            </div>
-
-            {/* Variants */}
-            <div className="mt-8">
-              <p className="text-lg font-semibold">Product Variants</p>
-              <div className="flex gap-4 flex-wrap">
-                {productVariants?.map((v) => (
-                  <div
-                    key={v.variant_id}
-                    className={`px-4 py-2 border rounded-md cursor-pointer ${v.variant_id === selectedVariant?.variant_id && "border-black"}`}
-                    onClick={() => setSelectedVariant(v)}
-                  >
-                    {v.color_id && (
-                      <p className="text-sm">
-                        Color: {colorName(v.color_id, colors)}
-                      </p>
-                    )}
-                    {v.size_id && (
-                      <p className="text-sm">
-                        Size: {sizeName(v.size_id, sizes)}
-                      </p>
-                    )}
-                  </div>
-                ))}
+          <div className="col-span-5 md:col-span-2 flex flex-col p-4 max-h-[calc(100vh-8rem)] overflow-auto scrollbar-thin">
+            <div>
+              <h1 className="text-2xl font-bold">{product?.product_name}</h1>
+              {/* Price */}
+              <div className="mt-6 flex gap-2 items-center text-gray-600 font-extrabold">
+                <p>$ {selectedVariant?.price}</p>
               </div>
-            </div>
 
-            {/* Tags */}
-            <div className="mt-8">
-              <p className="text-lg font-semibold">Product Tags</p>
-              <div className="flex gap-4 flex-wrap">
-                {productTags?.map((t) => (
-                  <div key={t.tag_id} className="px-2 bg-gray-300 rounded-md">
-                    <p className="text-sm">{tagName(t.tag_id, tags)}</p>
-                  </div>
-                ))}
+              {/* Variants */}
+              <div className="mt-8">
+                <p className="text-lg font-semibold">Product Variants</p>
+                <div className="flex gap-4 flex-wrap">
+                  {productVariants?.map((v) => (
+                    <div
+                      key={v.variant_id}
+                      className={`px-4 py-2 border rounded-md cursor-pointer ${v.variant_id === selectedVariant?.variant_id && "border-black"}`}
+                      onClick={() => setSelectedVariant(v)}
+                    >
+                      {v.color_id && (
+                        <p className="text-sm">
+                          Color: {colorName(v.color_id, colors)}
+                        </p>
+                      )}
+                      {v.size_id && (
+                        <p className="text-sm">
+                          Size: {sizeName(v.size_id, sizes)}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-            {/* Description */}
-            <div className="mt-6 ">
-              <p className="text-lg font-semibold">Description</p>
-              <p className="text-sm text-gray-700 whitespace-pre-line">
-                {product?.description}
-              </p>
+
+              {/* Tags */}
+              <div className="mt-8">
+                <p className="text-lg font-semibold">Product Tags</p>
+                <div className="flex gap-4 flex-wrap">
+                  {productTags?.map((t) => (
+                    <div key={t.tag_id} className="px-2 bg-gray-300 rounded-md">
+                      <p className="text-sm">{tagName(t.tag_id, tags)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Description */}
+              <div className="mt-6 ">
+                <div
+                  className="flex items-center justify-between mb-2 border-b cursor-pointer"
+                  onClick={() => {
+                    setFold((prev) => !prev);
+                  }}
+                >
+                  <p className="text-lg font-semibold">Description</p>
+                  {fold ? <ChevronDown /> : <ChevronLeft />}
+                </div>
+                {!fold && (
+                  <p className="text-sm text-gray-700 whitespace-pre-line">
+                    {product?.description}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Add to cart Button */}
-            <div className="flex h-10 items-center justify-center gap-4 bg-black px-2 py-1 cursor-pointer text-white w-full md:w-auto mt-6">
+            <Button
+              variant={"secondary"}
+              className="flex h-10 items-center justify-center gap-4 px-2 py-1 cursor-pointer w-full md:w-auto mt-6 "
+              onClick={handleAddtoCart}
+              disabled={
+                submitting ||
+                cartItems
+                  ?.map((item) => item.variant_id)
+                  .includes(selectedVariant?.variant_id as number)
+              }
+            >
               <p className="font-semibold">Add to Cart</p>
-              <Plus />
-            </div>
+              {submitting ? <Spinner /> : <Plus />}
+            </Button>
           </div>
         </div>
       )}

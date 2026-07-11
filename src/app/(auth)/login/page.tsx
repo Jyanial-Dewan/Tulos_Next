@@ -23,6 +23,7 @@ import { postData } from "@/utility/httpRequest";
 import { endpoints } from "@/variables/variables";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -42,6 +43,7 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,8 +63,10 @@ const Login = () => {
     };
 
     const res = await postData(params);
+
     if (res?.status === 200) {
       dispatch(setToken(res?.data));
+      router.back();
     }
   };
   return (

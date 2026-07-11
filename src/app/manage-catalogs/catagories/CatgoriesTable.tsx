@@ -115,7 +115,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
 
     const fetchCatagories = async () => {
       const res = await loadData(params);
-      console.log(res);
+
       if (res?.data) {
         setData(res.data.result);
         dispatch(setCatagories(res.data.result as ICatagory[]));

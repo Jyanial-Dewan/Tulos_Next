@@ -99,7 +99,7 @@ const Modal = ({
         // accessToken: token.access_token,
       };
       const res = await postData(params);
-      console.log(res);
+
       if (res?.status === 201) {
         setState((prev) => prev + 1);
         form.reset();

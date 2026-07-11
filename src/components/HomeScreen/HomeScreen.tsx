@@ -54,7 +54,7 @@ export default function HomeScreen() {
         };
 
         const res = await loadData(params);
-        console.log(res);
+
         if (res?.status === 200) {
           setNewCollectionProducts(res.data.result);
         }
@@ -76,7 +76,7 @@ export default function HomeScreen() {
         };
 
         const res = await loadData(params);
-        console.log(res);
+
         if (res?.status === 200) {
           setPreviousCollectionProducts(res.data.result);
         }
