@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import sharp from "sharp";
+import sizeOf from "image-size";
 import path from "path";
 import crypto from "crypto";
 import { mkdir, unlink, writeFile } from "fs/promises";
@@ -131,7 +131,15 @@ export async function POST(req: Request) {
 
       const buffer = Buffer.from(await file.arrayBuffer());
 
-      const { width, height } = await sharp(buffer).metadata();
+      let width: number | undefined;
+      let height: number | undefined;
+      try {
+        const dimensions = sizeOf(buffer);
+        width = dimensions.width;
+        height = dimensions.height;
+      } catch {
+        // buffer is not a valid image
+      }
       if (!width || !height) {
         return NextResponse.json(
           { message: `Could not read dimensions for "${file.name}"` },
