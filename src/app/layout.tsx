@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${font.className} h-full antialiased`}>
+      <body className={`${font.className} h-full antialiased`} suppressHydrationWarning>
         <StoreProvider>
           <CatalogProvider>
             <Navbar />

@@ -265,22 +265,13 @@ export default function HomeScreen() {
           renderItem={(item) => (
             <div className="">
               <div className="h-48 md:h-80 flex items-center justify-center border relative">
-                {item?.image_urls?.[0] ? (
-                  <Image
-                    src={item.image_urls[0] ?? "/no-image.svg"}
-                    unoptimized={!item.image_urls[0]}
-                    alt={item.product_name}
-                    width={180}
-                    height={175}
-                  />
-                ) : (
-                  <div className="w-10 h-15 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
-                    No image
-                  </div>
-                )}
-                <span className="absolute bottom-0 bg-gray-300 p-2 flex justify-center items-center">
-                  <Plus />
-                </span>
+                <Image
+                  src={item.image_urls[0] ?? "/no-image.svg"}
+                  unoptimized={!item.image_urls[0]}
+                  alt={item.product_name}
+                  width={180}
+                  height={175}
+                />
               </div>
               <div className="pt-4">
                 <p className="text-gray-600">

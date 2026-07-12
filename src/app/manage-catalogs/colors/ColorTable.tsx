@@ -60,6 +60,10 @@ const ColorTable = ({ catalogType, setCatalogType }: Props) => {
   const [reloadController, setReloadController] = React.useState(1);
   const [isloaded, setIsloaded] = React.useState(false);
   const [action, setAction] = React.useState("");
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const columns = React.useMemo(() => getColumns(), []);
   const table = useReactTable({
@@ -79,6 +83,7 @@ const ColorTable = ({ catalogType, setCatalogType }: Props) => {
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
   const hiddenColumns = [
@@ -115,8 +120,14 @@ const ColorTable = ({ catalogType, setCatalogType }: Props) => {
       const res = await loadData(params);
 
       if (res?.data) {
-        setData(res.data.result);
-        dispatch(setColors(res.data.result));
+        const result = res.data.result;
+        setData(result);
+        dispatch(setColors(result));
+        // update pageSize once real data length is known
+        setPagination((prev) => ({
+          ...prev,
+          pageSize: result.length || 10,
+        }));
       }
       setSelectedColors([]);
       setIsloaded(true);
