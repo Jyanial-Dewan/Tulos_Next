@@ -28,17 +28,17 @@ function ProductItem({ item, products = true }: CarouselProps) {
           unoptimized={!item.image_urls?.[0]}
           className="hover:scale-105 transition-all duration-300"
         />
-        {!products && (
+        {/* {!products && (
           <span className="absolute bottom-0 bg-gray-300 p-2 flex justify-center items-center">
             <Plus />
           </span>
-        )}
+        )} */}
       </div>
       <div>
-        <span className="bg-gray-700 text-white px-2 rounded-sm text-[10px] absolute top-2 right-2">
+        <span className="bg-gray-700 text-white px-2 py-0.5 rounded-sm text-[10px] absolute top-2 right-2">
           {categoryName(item.catagory_id, catagories)}
         </span>
-        <h5 className="line-clamp-2">{item?.product_name}</h5>
+        <h5 className="line-clamp-2 mt-2">{item?.product_name}</h5>
         <span className="text-sm text-gray-600">
           ${item.min_price} - ${item.max_price}
         </span>

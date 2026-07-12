@@ -136,10 +136,10 @@ export default function HomeScreen() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:h-80 w-full">
         <div className="col-span-1 grid grid-cols-1 md:content-between gap-4">
           <div>
-            <h2 className="font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
+            <h2 className="font-extrabold text-xl sm:text-xl md:text-2xl lg:text-3xl">
               NEW
             </h2>
-            <h2 className="font-extrabold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
+            <h2 className="font-extrabold text-xl sm:text-xl md:text-2xl lg:text-3xl">
               COLLECTION
             </h2>
             <h4>
@@ -170,18 +170,13 @@ export default function HomeScreen() {
                 itemsPerScroll={{ sm: 1 }}
                 renderItem={(item) => (
                   <div className="h-full flex items-center justify-center">
-                    {item?.image_urls?.[0] ? (
-                      <Image
-                        src={item.image_urls[0]}
-                        alt={item.product_name}
-                        width={280}
-                        height={350}
-                      />
-                    ) : (
-                      <div className="w-10 h-15 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
-                        No image
-                      </div>
-                    )}
+                    <Image
+                      src={item.image_urls[0] ?? "/no-image.svg"}
+                      unoptimized={!item.image_urls[0]}
+                      alt={item.product_name}
+                      width={280}
+                      height={350}
+                    />
                   </div>
                 )}
               />
@@ -228,7 +223,8 @@ export default function HomeScreen() {
               <div className="h-full flex items-center justify-center border p-1">
                 {item?.image_urls?.[0] ? (
                   <Image
-                    src={item.image_urls[0]}
+                    src={item.image_urls[0] ?? "/no-image.svg"}
+                    unoptimized={!item.image_urls[0]}
                     alt={item.product_name}
                     width={220}
                     height={350}
@@ -248,7 +244,7 @@ export default function HomeScreen() {
         <div>
           <div className="flex justify-between items-center">
             <div className="relative inline-block">
-              <h2 className="font-extrabold text-4xl">Previous Collection</h2>
+              <h2 className="font-extrabold text-3xl">Previous Collection</h2>
               <span className="absolute -top-5 -right-10 text-blue-600 font-extrabold text-lg">
                 {`(${previousCollectionProducts.length})`}
               </span>
@@ -271,7 +267,8 @@ export default function HomeScreen() {
               <div className="h-48 md:h-80 flex items-center justify-center border relative">
                 {item?.image_urls?.[0] ? (
                   <Image
-                    src={item.image_urls[0]}
+                    src={item.image_urls[0] ?? "/no-image.svg"}
+                    unoptimized={!item.image_urls[0]}
                     alt={item.product_name}
                     width={180}
                     height={175}

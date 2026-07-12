@@ -1,7 +1,7 @@
 "use client";
 import ProductItem from "@/components/productItem/ProductItem";
 import { Spinner } from "@/components/ui/spinner";
-import { useAppDispatch, useAppSelector } from "@/hooks/useAppStore";
+import { useAppSelector } from "@/hooks/useAppStore";
 import { IProduct } from "@/store/slices/productSlice";
 import { loadData } from "@/utility/httpRequest";
 import { endpoints } from "@/variables/variables";
@@ -13,7 +13,6 @@ import { ListFilterPlus, X } from "lucide-react";
 
 export default function Products() {
   const {
-    sizes,
     catagories,
     colors,
     collections,

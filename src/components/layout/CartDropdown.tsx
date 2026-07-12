@@ -26,9 +26,11 @@ const CartDropdown = () => {
       <PopoverTrigger asChild>
         <Button className="rounded-full cursor-pointer w-7 h-7 p-1.5 relative">
           <ShoppingBag className="text-white" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 flex justify-center items-center bg-red-500 text-white text-xs rounded-full">
-            {cartItems?.length > 9 ? "9+" : cartItems?.length}
-          </span>
+          {cartItems?.length > 0 && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 flex justify-center items-center bg-red-500 text-white text-xs rounded-full">
+              {cartItems?.length > 9 ? "9+" : cartItems?.length}
+            </span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="max-h-[calc(100vh-8rem)] overflow-auto scrollbar-thin">
@@ -86,7 +88,7 @@ const CartDropdown = () => {
 
         <div className="border-b"></div>
         <div className="my-2 text-center font-semibold">
-          Subtotal: ${subtotal.toFixed(2)}
+          Subtotal: ${subtotal?.toFixed(2)}
         </div>
         <div className="border-b"></div>
         <Button className="flex-1 py-1">Proceed to Buy</Button>
