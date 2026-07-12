@@ -62,6 +62,10 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
   const [reloadController, setReloadController] = React.useState(1);
   const [isloaded, setIsloaded] = React.useState(false);
   const [action, setAction] = React.useState("");
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const columns = React.useMemo(() => getColumns(), []);
   const table = useReactTable({
@@ -81,6 +85,7 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
   const hiddenColumns = [
@@ -117,9 +122,14 @@ const CatgoriesTable = ({ catalogType, setCatalogType }: Props) => {
       const res = await loadData(params);
 
       if (res?.data) {
-        setData(res.data.result);
-        dispatch(setCatagories(res.data.result as ICatagory[]));
-        // setTotalPage(res.pages);
+        const result = res.data.result;
+        setData(result);
+        dispatch(setCatagories(result));
+        // update pageSize once real data length is known
+        setPagination((prev) => ({
+          ...prev,
+          pageSize: result.length || 10,
+        }));
       }
       setSelectedCatagories([]);
       setIsloaded(true);
