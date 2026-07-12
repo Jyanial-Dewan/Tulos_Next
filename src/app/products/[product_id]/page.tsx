@@ -108,18 +108,20 @@ const SingleProduct = () => {
           <div className="col-span-5 md:col-span-3 grid grid-cols-3 gap-6 border p-4 ">
             {/* Selected Image */}
             <div className="col-span-3 md:col-span-2 flex items-center justify-center">
-              {selectedImageUrl ? (
-                <Image
-                  src={selectedImageUrl}
-                  alt={"Product Image"}
-                  width={300}
-                  height={375}
-                />
+              <Image
+                src={selectedImageUrl ?? "/no-image.svg"}
+                unoptimized={!selectedImageUrl}
+                alt={"Product Image"}
+                width={300}
+                height={375}
+              />
+              {/* {selectedImageUrl ? (
+               
               ) : (
                 <div className="w-10 h-15 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
                   No image
                 </div>
-              )}
+              )} */}
             </div>
             {/* All Image */}
             <div className="col-span-3 md:col-span-1 flex md:flex-col items-center justify-center gap-3">
