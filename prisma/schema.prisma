@@ -24,6 +24,7 @@ model users {
   created_at  DateTime?    @default(now()) @db.Timestamp(6)
   cart_items  cart_items[]
   credentials credentials?
+  orders      orders[]
 }
 
 model categories {
@@ -96,20 +97,21 @@ model product_tags {
 }
 
 model product_variants {
-  variant_id Int          @id @default(autoincrement())
-  product_id Int
-  color_id   Int?
-  size_id    Int?
-  sku        String       @unique @db.VarChar(100)
-  barcode    String?      @db.VarChar(100)
-  price      Decimal      @db.Decimal(10, 2)
-  stock      Int?         @default(0)
-  created_at DateTime?    @default(now()) @db.Timestamp(6)
-  updated_at DateTime?    @default(now()) @db.Timestamp(6)
-  cart_items cart_items[]
-  colors     colors?      @relation(fields: [color_id], references: [color_id], onDelete: NoAction, onUpdate: NoAction)
-  products   products     @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
-  sizes      sizes?       @relation(fields: [size_id], references: [size_id], onDelete: NoAction, onUpdate: NoAction)
+  variant_id  Int           @id @default(autoincrement())
+  product_id  Int
+  color_id    Int?
+  size_id     Int?
+  sku         String        @unique @db.VarChar(100)
+  barcode     String?       @db.VarChar(100)
+  price       Decimal       @db.Decimal(10, 2)
+  stock       Int?          @default(0)
+  created_at  DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at  DateTime?     @default(now()) @db.Timestamp(6)
+  cart_items  cart_items[]
+  order_items order_items[]
+  colors      colors?       @relation(fields: [color_id], references: [color_id], onDelete: NoAction, onUpdate: NoAction)
+  products    products      @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: NoAction)
+  sizes       sizes?        @relation(fields: [size_id], references: [size_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([product_id, color_id, size_id], map: "unique_variant")
 }
@@ -149,6 +151,30 @@ model cart_items {
   @@unique([user_id, variant_id], map: "unique_user_variant")
 }
 
+model order_items {
+  order_item_id    Int              @id @default(autoincrement())
+  order_id         Int
+  variant_id       Int
+  quantity         Int              @default(1)
+  created_at       DateTime?        @default(now()) @db.Timestamp(6)
+  orders           orders           @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order_items_order")
+  product_variants product_variants @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order_items_variant")
+}
+
+model orders {
+  order_id         Int           @id @default(autoincrement())
+  customer_id      Int
+  total_amount     Decimal       @db.Decimal(10, 2)
+  payment_status   String        @default("UNPAID") @db.VarChar(30)
+  payment_method   String?       @db.VarChar(50)
+  delivery_address String?
+  notes            String?
+  created_at       DateTime?     @default(now()) @db.Timestamp(6)
+  updated_at       DateTime?     @default(now()) @db.Timestamp(6)
+  order_items      order_items[]
+  users            users         @relation(fields: [customer_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order_customer")
+}
+
 model product_view {
   product_id      Int      @id
   product_name    String
@@ -172,25 +198,35 @@ model cart_items_view {
   user_id      Int
   quantity     Int
   added_at     DateTime
-
   variant_id   Int
   sku          String
   barcode      String?
   price        Decimal  @db.Decimal(10, 2)
   stock        Int
   line_total   Decimal  @db.Decimal(10, 2)
-
   product_id   Int
   product_name String
   description  String?
-
   color_id     Int?
   color_name   String?
-
   size_id      Int?
   size_name    String?
-
   image_url    String?
 
   @@map("cart_items_view")
+}
+
+model order_view {
+  order_id          Int      @id
+  customer_id       Int
+  customer_name     String?
+  total_amount      Decimal  @db.Decimal(10, 2)
+  payment_status    String   @db.VarChar(30)
+  payment_method    String?  @db.VarChar(50)
+  delivery_address  String?
+  notes             String?
+  created_at        DateTime?
+  order_items       Json
+
+  @@map("order_view")
 }

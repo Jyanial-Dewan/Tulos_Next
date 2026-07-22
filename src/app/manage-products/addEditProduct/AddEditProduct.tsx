@@ -209,7 +209,7 @@ const AddEditProduct = ({ setProduct, action, product }: Props) => {
           <div>
             <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
               <FieldGroup className="space-y-2 lg:grid lg:grid-cols-2 gap-4">
-                {/* Size Name */}
+                {/* Product Name */}
                 <Controller
                   name="product_name"
                   control={form.control}

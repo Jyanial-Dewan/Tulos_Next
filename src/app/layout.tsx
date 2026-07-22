@@ -7,11 +7,24 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Toaster } from "@/components/ui/sonner";
 import CatalogProvider from "@/store/CatalogProvider";
+import localFont from "next/font/local";
 
-const font = Cinzel({
-  weight: ["400", "500", "600", "700", "800", "900"],
-  subsets: ["latin"],
+const font = localFont({
+  src: [
+    { path: "../fonts/Cinzel-Regular.ttf", weight: "400", style: "normal" },
+    { path: "../fonts/Cinzel-Medium.ttf", weight: "500", style: "normal" },
+    { path: "../fonts/Cinzel-SemiBold.ttf", weight: "600", style: "normal" },
+    { path: "../fonts/Cinzel-Bold.ttf", weight: "700", style: "normal" },
+    { path: "../fonts/Cinzel-ExtraBold.ttf", weight: "800", style: "normal" },
+    { path: "../fonts/Cinzel-Black.ttf", weight: "900", style: "normal" },
+  ],
+  variable: "--font-cinzel",
 });
+
+// const font = Cinzel({
+//   weight: ["400", "500", "600", "700", "800", "900"],
+//   subsets: ["latin"],
+// });
 
 export const metadata: Metadata = {
   title: "Tulos",
@@ -25,7 +38,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${font.className} h-full antialiased`} suppressHydrationWarning>
+      <body
+        className={`${font.className} h-full antialiased`}
+        suppressHydrationWarning
+      >
         <StoreProvider>
           <CatalogProvider>
             <Navbar />
