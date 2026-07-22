@@ -40,9 +40,9 @@ const CartDropdown = () => {
 
         {cartItems?.map((item) => (
           <div key={item.cart_item_id} className="flex gap-4">
-            <div className="w-25 h-31.25">
+            <div className="flex flex-col items-center">
               <Image src={item.image_url} alt="image" width={60} height={75} />
-              <p className="font-semibold">${item.line_total}</p>
+              <p className="font-semibold mt-1">${item.line_total}</p>
             </div>
             <div>
               <p>{item.product_name}</p>
