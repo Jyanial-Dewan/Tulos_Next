@@ -217,14 +217,23 @@ const AddEditProductImage = ({ product }: Props) => {
         },
       );
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
-      if (res.ok) {
-        toast(`${data.message}`);
-      }
       if (!res.ok) {
-        toast(`${data.message}`);
+        const message = data?.message ?? data?.error ?? "Upload failed";
+        toast.error(message);
+        setError(message);
+        return;
       }
+
+      if (!Array.isArray(data.result)) {
+        const message = "Upload succeeded but no images were returned.";
+        toast.error(message);
+        setError(message);
+        return;
+      }
+
+      toast(data.message ?? "Images added");
 
       // Replace the "new" queue items with "existing" ones using the server's response,
       // so their previewUrl now points to the permanent path instead of a blob URL.
