@@ -1,9 +1,11 @@
 import { prisma } from "@/lib/db";
+import {
+  deleteProductImage,
+  storeProductImage,
+  type StoredImage,
+} from "@/lib/image-storage";
 import { NextRequest, NextResponse } from "next/server";
 import sizeOf from "image-size";
-import path from "path";
-import crypto from "crypto";
-import { mkdir, unlink, writeFile } from "fs/promises";
 
 const MAX_SIZE = 1 * 1024 * 1024; // 1MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -39,7 +41,7 @@ export async function POST(req: Request) {
   const { searchParams } = new URL(req.url);
   const productId = searchParams.get("product_id");
 
-  const writtenFilePaths: string[] = [];
+  const writtenFiles: StoredImage[] = [];
 
   try {
     if (!productId || Number.isNaN(Number(productId))) {
@@ -109,8 +111,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validate every file up front before writing anything to disk
-    const validatedFiles: { buffer: Buffer; ext: string }[] = [];
+    // Validate every file up front before writing anything to storage
+    const validatedFiles: {
+      buffer: Buffer;
+      ext: string;
+      contentType: string;
+    }[] = [];
 
     for (const file of files) {
       if (!ALLOWED_TYPES.includes(file.type)) {
@@ -154,15 +160,12 @@ export async function POST(req: Request) {
             ? "webp"
             : "jpg";
 
-      validatedFiles.push({ buffer, ext });
+      validatedFiles.push({ buffer, ext, contentType: file.type });
     }
 
     // Re-check the count inside a transaction to close the race-condition
     // window between the earlier count check and now (e.g. two concurrent
     // requests both passing the initial check).
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
-    await mkdir(uploadDir, { recursive: true });
-
     try {
       const result = await prisma.$transaction(async (tx) => {
         const currentCount = await tx.product_images.count({
@@ -174,15 +177,12 @@ export async function POST(req: Request) {
         }
 
         const created = [];
-        for (const { buffer, ext } of validatedFiles) {
-          const fileName = `${crypto.randomUUID()}.${ext}`;
-          const filePath = path.join(uploadDir, fileName);
-          await writeFile(filePath, buffer);
-          writtenFilePaths.push(filePath);
+        for (const { buffer, ext, contentType } of validatedFiles) {
+          const stored = await storeProductImage(buffer, ext, contentType);
+          writtenFiles.push(stored);
 
-          const image_url = `/uploads/products/${fileName}`;
           const image = await tx.product_images.create({
-            data: { product_id: productIdNum, image_url },
+            data: { product_id: productIdNum, image_url: stored.image_url },
           });
           created.push(image);
         }
@@ -194,7 +194,8 @@ export async function POST(req: Request) {
         { status: 201 },
       );
     } catch (txErr: any) {
-      await Promise.all(writtenFilePaths.map((p) => unlink(p).catch(() => {})));
+      await Promise.all(writtenFiles.map((file) => file.cleanup()));
+      writtenFiles.length = 0;
 
       if (txErr.message === "LIMIT_REACHED") {
         return NextResponse.json(
@@ -207,7 +208,7 @@ export async function POST(req: Request) {
       throw txErr;
     }
   } catch (err) {
-    await Promise.all(writtenFilePaths.map((p) => unlink(p).catch(() => {})));
+    await Promise.all(writtenFiles.map((file) => file.cleanup()));
     console.error(err);
     return NextResponse.json(
       { message: "Something went wrong" },
@@ -255,11 +256,13 @@ export async function DELETE(req: NextRequest) {
 
     await prisma.product_images.delete({ where: { image_id: imageIdNum } });
 
-    const filePath = path.join(process.cwd(), "public", image.image_url);
     try {
-      await unlink(filePath);
+      await deleteProductImage(image.image_url);
     } catch (fileErr: any) {
-      console.error(`Failed to delete file at ${filePath}:`, fileErr.message);
+      console.error(
+        `Failed to delete stored image at ${image.image_url}:`,
+        fileErr.message,
+      );
     }
 
     return NextResponse.json({
