@@ -2,7 +2,12 @@ import { prisma } from "@/lib/db";
 import { comparePassword } from "@/utility/util";
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { ACCESS_TOKEN_EXPIRED_TIME, JWT_SECRET_ACCESS_TOKEN, JWT_SECRET_REFRESH_TOKEN, REFRESH_TOKEN_EXPIRED_TIME } from "@/variables/variables";
+import {
+  ACCESS_TOKEN_EXPIRED_TIME,
+  JWT_SECRET_ACCESS_TOKEN,
+  JWT_SECRET_REFRESH_TOKEN,
+  REFRESH_TOKEN_EXPIRED_TIME,
+} from "@/variables/variables";
 
 function generateAccessTokenAndRefreshToken(props: object) {
   const accessToken = jwt.sign(props, JWT_SECRET_ACCESS_TOKEN!, {
@@ -16,9 +21,9 @@ function generateAccessTokenAndRefreshToken(props: object) {
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { password,user } = body;
+  const { password, user } = body;
 
-  try { 
+  try {
     if (!user || !password) {
       return NextResponse.json(
         { message: "Username and password are required." },
@@ -31,10 +36,7 @@ export async function POST(req: Request) {
     });
 
     if (!userRecord) {
-      return NextResponse.json(
-        { message: "User not found." },
-        { status: 404 },
-      );
+      return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
 
     const userCredential = await prisma.credentials.findUnique({
@@ -95,4 +97,3 @@ export async function POST(req: Request) {
 export async function DELETE() {
   return NextResponse.json({ message: "Logged out" });
 }
-
