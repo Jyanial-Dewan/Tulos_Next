@@ -10,6 +10,48 @@ import Pagination from "@/components/pagination/Pagination";
 import { Slider } from "@/components/ui/slider";
 import FilterProduct from "../../components/filterProduct/FilterProduct";
 import { ListFilterPlus, X } from "lucide-react";
+import SearchInput from "@/components/searchInput/SearchInput";
+
+type FacetKey =
+  | "availabilities"
+  | "categories"
+  | "colors"
+  | "collections"
+  | "tags"
+  | "genders"
+  | "brands";
+
+type FacetCounts = Record<FacetKey, { id: number; count: number }[]>;
+
+const facetKeys: FacetKey[] = [
+  "availabilities",
+  "categories",
+  "colors",
+  "collections",
+  "tags",
+  "genders",
+  "brands",
+];
+
+const createEmptySelection = (): Record<FacetKey, number[]> => ({
+  availabilities: [],
+  categories: [],
+  colors: [],
+  collections: [],
+  tags: [],
+  genders: [],
+  brands: [],
+});
+
+const createEmptyCounts = (): FacetCounts => ({
+  availabilities: [],
+  categories: [],
+  colors: [],
+  collections: [],
+  tags: [],
+  genders: [],
+  brands: [],
+});
 
 export default function Products() {
   const {
@@ -21,239 +63,267 @@ export default function Products() {
     brands,
     availabilities,
   } = useAppSelector((state) => state.catalog);
+
   const [products, setProducts] = useState<IProduct[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(12);
+  const [limit] = useState(12);
+  const [total, setTotal] = useState(0);
   const [totalPage, setTotalPage] = useState(1);
-  const [value, setValue] = useState([100, 100]);
+  const [query, setQuery] = useState("");
+  const [selected, setSelected] = useState<Record<FacetKey, number[]>>(
+    createEmptySelection,
+  );
+  const [facetCounts, setFacetCounts] = useState<FacetCounts>(createEmptyCounts);
+  const [facetsLoaded, setFacetsLoaded] = useState(false);
+  const [priceBounds, setPriceBounds] = useState({ min: 100, max: 100000 });
+  const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  // const dispatch = useAppDispatch();
 
-  const accordionItems = [
+  const toggleFacet = (key: FacetKey, id: number) => {
+    setSelected((current) => ({
+      ...current,
+      [key]: current[key].includes(id)
+        ? current[key].filter((value) => value !== id)
+        : [...current[key], id],
+    }));
+    setPage(1);
+  };
+
+  const clearFilters = () => {
+    setSelected(createEmptySelection());
+    setPriceRange(null);
+    setQuery("");
+    setPage(1);
+  };
+
+  const activeFilterCount =
+    facetKeys.reduce((count, key) => count + selected[key].length, 0) +
+    (priceRange ? 1 : 0) +
+    (query.trim() ? 1 : 0);
+
+  const facetConfigs: {
+    key: FacetKey;
+    trigger: string;
+    items: { id: number; label: string }[];
+    containerClassName?: string;
+  }[] = [
     {
-      value: "availabilities",
+      key: "availabilities",
       trigger: "Availabilities",
-      content: (
-        <div className="flex flex-col gap-2">
-          {availabilities.map((ava) => (
-            <label
-              key={ava.availability_id}
-              className="flex items-center gap-2 cursor-pointer py-1"
-            >
-              <input
-                type="checkbox"
-                value={ava.availability_id}
-                className="rounded"
-              />
-              <span>{ava.availability_name}</span>
-            </label>
-          ))}
-        </div>
-      ),
+      items: availabilities.map((ava) => ({
+        id: ava.availability_id,
+        label: ava.availability_name,
+      })),
     },
     {
-      value: "categories",
+      key: "categories",
       trigger: "Categories",
-      content: (
-        <div className="flex flex-col gap-2">
-          {catagories.map((cat) => (
-            <label
-              key={cat.catagory_id}
-              className="flex items-center gap-2 cursor-pointer py-1"
-            >
-              <input
-                type="checkbox"
-                value={cat.catagory_id}
-                className="rounded"
-              />
-              <span>{cat.catagory_name}</span>
-            </label>
-          ))}
-        </div>
-      ),
+      items: catagories.map((cat) => ({
+        id: cat.catagory_id,
+        label: cat.catagory_name,
+      })),
     },
     {
-      value: "colors",
+      key: "colors",
       trigger: "Colors",
-      content: (
-        <div className="flex flex-col gap-2">
-          {colors.map((color) => (
-            <label
-              key={color.color_id}
-              className="flex items-center gap-2 cursor-pointer py-1"
-            >
-              <input
-                type="checkbox"
-                value={color.color_id}
-                className="rounded"
-              />
-              <span>{color.color_name}</span>
-            </label>
-          ))}
-        </div>
-      ),
+      items: colors.map((color) => ({
+        id: color.color_id,
+        label: color.color_name,
+      })),
     },
     {
-      value: "collections",
+      key: "collections",
       trigger: "Collections",
-      content: (
-        <div className="flex flex-col gap-2">
-          {collections.map((coll) => (
-            <label
-              key={coll.collection_id}
-              className="flex items-center gap-2 cursor-pointer py-1"
-            >
-              <input
-                type="checkbox"
-                value={coll.collection_id}
-                className="rounded"
-              />
-              <span>{coll.collection_name}</span>
-            </label>
-          ))}
-        </div>
-      ),
+      items: collections.map((coll) => ({
+        id: coll.collection_id,
+        label: coll.collection_name,
+      })),
     },
     {
-      value: "tags",
+      key: "tags",
       trigger: "Tags",
-      content: (
-        <div className="flex flex-col gap-2">
-          {tags.map((tag) => (
-            <label
-              key={tag.tag_id}
-              className="flex items-center gap-2 cursor-pointer py-1"
-            >
-              <input type="checkbox" value={tag.tag_id} className="rounded" />
-              <span>{tag.tag_name}</span>
-            </label>
-          ))}
-        </div>
-      ),
+      items: tags.map((tag) => ({ id: tag.tag_id, label: tag.tag_name })),
     },
     {
-      value: "genders",
+      key: "genders",
       trigger: "Genders",
-      content: (
-        <div className="flex flex-col gap-2">
-          {genders.map((gen) => (
-            <label
-              key={gen.gender_id}
-              className="flex items-center gap-2 cursor-pointer py-1"
-            >
-              <input
-                type="checkbox"
-                value={gen.gender_id}
-                className="rounded"
-              />
-              <span>{gen.gender_name}</span>
-            </label>
-          ))}
-        </div>
-      ),
+      items: genders.map((gen) => ({
+        id: gen.gender_id,
+        label: gen.gender_name,
+      })),
     },
     {
-      value: "brands",
+      key: "brands",
       trigger: "Brands",
-      content: (
-        <div className="flex flex-col gap-2 h-50 overflow-x-auto custom">
-          {/* {brands.map((brand) => (
-            <button
-              key={brand.brand_id}
-              className="border rounded p-2 text-sm text-center hover:bg-muted"
-            >
-              <input type="checkbox" value={brand.brand_id} className="rounded" />
-              {brand.brand_name}
-            </button>
-          ))} */}
-          {brands.map((brand) => (
-            <label
-              key={brand.brand_id}
-              className="flex items-center gap-2 cursor-pointer py-1"
-            >
-              <input
-                type="checkbox"
-                value={brand.brand_id}
-                className="rounded"
-              />
-              <span>{brand.brand_name}</span>
-            </label>
-          ))}
-        </div>
-      ),
+      items: brands.map((brand) => ({
+        id: brand.brand_id,
+        label: brand.brand_name,
+      })),
+      containerClassName: "h-50 overflow-x-auto custom",
     },
   ];
 
-  // Products
-  useEffect(() => {
-    (async () => {
-      const params = {
-        url: `${endpoints.Products}?page=${page}&limit=${limit}`,
-        // url: `${endpoints.Products}?product_id=${}&page=${}&limit=${}&product_name=${}`,
-        // payload: { user: data.user, password: data.password },
-        // isConsole: true,
-        // isToast: true,
-        setLoading: setIsLoading,
-      };
+  const accordionItems = facetConfigs.map((config) => ({
+    value: config.key,
+    trigger: config.trigger,
+    content: (
+      <div
+        className={`flex flex-col gap-2 ${config.containerClassName ?? ""}`}
+      >
+        {config.items.map((item) => {
+          const checked = selected[config.key].includes(item.id);
+          const count =
+            facetCounts[config.key].find((entry) => entry.id === item.id)
+              ?.count ?? 0;
 
-      const res = await loadData(params);
-      if (res?.data) {
-        setProducts(res.data.result);
-        setTotalPage(res.data.totalPages);
-      } else {
-        setTotalPage(1);
+          return (
+            <label
+              key={item.id}
+              className="flex w-full items-center gap-2 cursor-pointer py-1"
+            >
+              <input
+                type="checkbox"
+                checked={checked}
+                disabled={facetsLoaded && !checked && count === 0}
+                onChange={() => toggleFacet(config.key, item.id)}
+                className="rounded"
+              />
+              <span>{item.label}</span>
+              <span className="ml-auto text-xs text-muted-foreground">
+                {count}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+    ),
+  }));
+
+  useEffect(() => {
+    let active = true;
+
+    const timer = setTimeout(async () => {
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+      });
+      if (query.trim()) params.set("q", query.trim());
+      facetKeys.forEach((key) => {
+        if (selected[key].length > 0) {
+          params.set(key, selected[key].join(","));
+        }
+      });
+      if (priceRange) {
+        params.set("min_price", String(priceRange[0]));
+        params.set("max_price", String(priceRange[1]));
       }
-    })();
-  }, [page, limit, totalPage]);
+
+      setIsLoading(true);
+      try {
+        const res = await loadData({
+          url: `${endpoints.ProductsFaceted}?${params.toString()}`,
+        });
+        if (!active || !res?.data) {
+          if (active) {
+            setProducts([]);
+            setTotal(0);
+            setTotalPage(1);
+          }
+          return;
+        }
+
+        setProducts(res.data.result ?? []);
+        setTotal(res.data.total ?? 0);
+        setTotalPage(res.data.totalPages ?? 1);
+        setFacetCounts(res.data.facets ?? createEmptyCounts());
+        setFacetsLoaded(true);
+        if (res.data.priceRange) {
+          setPriceBounds(res.data.priceRange);
+        }
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    }, query.trim() ? 300 : 0);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [page, limit, query, selected, priceRange]);
+
+  const displayedPrice = priceRange ?? [priceBounds.min, priceBounds.max];
+
+  const priceRangeControl = (
+    <div className="flex flex-col my-4 gap-4">
+      <span>Price Range</span>
+      <span className="text-sm text-center text-muted-foreground border p-2">
+        {displayedPrice.join(" - ")}
+      </span>
+      <div className="flex flex-col gap-3">
+        <Slider
+          id="product-price-range"
+          value={displayedPrice}
+          onValueChange={(value) => {
+            setPriceRange(value as [number, number]);
+            setPage(1);
+          }}
+          min={priceBounds.min}
+          max={priceBounds.max}
+          step={10}
+        />
+      </div>
+    </div>
+  );
+
+  const filterHeader = (
+    <div className="flex items-center justify-between">
+      <span className="font-bold">Filters</span>
+      {activeFilterCount > 0 && (
+        <button
+          onClick={clearFilters}
+          className="text-sm text-muted-foreground hover:underline"
+        >
+          Clear all ({activeFilterCount})
+        </button>
+      )}
+    </div>
+  );
 
   return (
     <>
       <div className="grid grid-cols-4 gap-6">
         {/* filters */}
         <div className="col-span-1 hidden md:block">
-          <span className="font-bold">Filters</span>
-          {/* Size  */}
-          {/* <div className="flex flex-col my-2">
-                <span>Size</span>
-                <div className="flex gap-3">
-                  {["XS", "S", "M", "L", "2XL"].map((size, i) => (
-                    <span key={i} className="border h-10 w-10 flex justify-center items-center">{size}</span>
-                  ))}
-                </div>
-            </div>
-        <div className="border-b  border-gray-300" /> */}
-
-          {/* Price Range */}
-          <div className="flex flex-col my-4 gap-4">
-            <span>Price Range</span>
-            <span className="text-sm text-center text-muted-foreground border p-2">
-              {value.join(" - ")}
-            </span>
-            <div className="flex flex-col gap-3">
-              <Slider
-                id="slider-demo-temperature"
-                value={value}
-                onValueChange={(value) => setValue(value as number[])}
-                min={100}
-                max={100000}
-                step={10}
-              />
-            </div>
-          </div>
-          <div className="border-b  border-gray-300" />
+          {filterHeader}
+          {priceRangeControl}
+          <div className="border-b border-gray-300" />
           <FilterProduct items={accordionItems} />
         </div>
 
         {/* all products */}
         <div className="col-span-4 md:col-span-3">
-          <button
-            className="md:hidden"
-            onClick={() => setMobileFilterOpen(true)}
-          >
-            <ListFilterPlus />
-          </button>
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4  gap-6">
+          <div className="mb-4 flex items-center gap-3">
+            <button
+              className="md:hidden"
+              onClick={() => setMobileFilterOpen(true)}
+            >
+              <ListFilterPlus />
+            </button>
+            <SearchInput
+              placeholder="Search products"
+              query={query}
+              setQuery={(value) => {
+                setQuery(value);
+                setPage(1);
+              }}
+            />
+            <span className="hidden sm:inline text-sm text-muted-foreground whitespace-nowrap">
+              {total} products
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {isLoading ? (
               <div className="col-span-2 md:col-span-3 xl:col-span-4 grid place-items-center h-[80vh] w-full">
                 <Spinner className="w-10 h-10" />
@@ -261,7 +331,7 @@ export default function Products() {
             ) : (
               <>
                 {products.map((product, i) => (
-                  <ProductItem key={i} item={product} />
+                  <ProductItem key={product.product_id ?? i} item={product} />
                 ))}
               </>
             )}
@@ -293,28 +363,13 @@ export default function Products() {
             }`}
           >
             <div className="sticky top-0 bg-white z-50 border-b px-4 py-3 flex items-center justify-between rounded-t-2xl">
-              <span className="font-bold">Filters</span>
+              {filterHeader}
               <button onClick={() => setMobileFilterOpen(false)}>
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-4 overflow-y-auto">
-              <div className="flex flex-col my-4 gap-4">
-                <span>Price Range</span>
-                <span className="text-sm text-center text-muted-foreground border p-2">
-                  {value.join(" - ")}
-                </span>
-                <div className="flex flex-col gap-3">
-                  <Slider
-                    id="slider-demo-temperature"
-                    value={value}
-                    onValueChange={(value) => setValue(value as number[])}
-                    min={100}
-                    max={100000}
-                    step={10}
-                  />
-                </div>
-              </div>
+              {priceRangeControl}
               <div className="border-b border-gray-300" />
               <FilterProduct items={accordionItems} />
             </div>
