@@ -18,6 +18,7 @@ export const endpoints = {
   Brands: "/brands",
   Sizes: "/sizes",
   Products: "/products",
+  ProductsFaceted: "/products/faceted",
   ProductTags: "/product_tags",
   ProductVariants: "/product_variants",
   ProductImages: "/product_images",
